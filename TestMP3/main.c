@@ -29,7 +29,7 @@ int main(void){
 	while(1){
 for(pocitadlo = 0; pocitadlo<100;pocitadlo++){
 	lcd_int_al(15,0,pocitadlo,_right);
-	suart_putint(pocitadlo);
+
 	_delay_ms(500);
 }
 

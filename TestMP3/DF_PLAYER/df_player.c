@@ -21,8 +21,6 @@ int send_command(TCOMMAND *command){
 	for (uint8_t i = 0; i<10; i++){
 		suart_putint(command->bytes[i]);
 	}
-
-
 	return 1;
 
 }
