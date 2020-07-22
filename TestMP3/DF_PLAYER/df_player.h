@@ -9,7 +9,7 @@
 #define DF_PLAYER_H_
 
 typedef union{
-	uint8_t bytes[9];
+	uint8_t bytes[10];
 	struct {
 		uint8_t SS;
 		uint8_t VER;
