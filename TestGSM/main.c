@@ -7,6 +7,12 @@
 
 
 #include <avr/io.h>
+#include <avr/io.h>
+#include <avr/eeprom.h>
+#include <avr/pgmspace.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <avr/interrupt.h>
 #include "MK_I2C/mk_i2c.h"
 #include "MK_LCD/mk_lcd44780.h"
 
