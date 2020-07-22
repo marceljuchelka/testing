@@ -7,6 +7,8 @@
 
 
 #include <avr/io.h>
+#include "MK_I2C/mk_i2c.h"
+#include "MK_LCD/mk_lcd44780.h"
 
 
 int main(void){
