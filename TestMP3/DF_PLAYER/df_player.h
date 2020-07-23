@@ -18,7 +18,7 @@ typedef union{
 		uint8_t Feedback;
 		uint8_t para_H;
 		uint8_t para_L;
-		uint8_t checksum;
+		uint16_t checksum;
 		uint8_t End_bit;
 	};
 } TCOMMAND;

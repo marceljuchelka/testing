@@ -24,3 +24,9 @@ int send_command(TCOMMAND *command){
 	return 1;
 
 }
+
+void checksum (TCOMMAND *command){
+	for( uint8_t pozice = 1; pozice<7; pozice++){
+		command->checksum=+command->bytes[pozice];
+	}
+}
