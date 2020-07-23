@@ -35,7 +35,9 @@
 // Table 4-2. Baud Rate Table (str.8)
 
 
-#define b_value 135
+#define b_value 140
+
+//nastaveno na 9600 bey krystalu 140
 
 /*
 ; Some b values:     (See also table in Appnote AVR-305 documentation)
