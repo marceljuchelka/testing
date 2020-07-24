@@ -13,6 +13,7 @@
 #include "df_player.h"
 #include "command.h"
 #include "../SoftUART/soft_uart.h"
+#include "../UART/uart.h"
 
 TCOMMAND send_buff = {{0x7E, 0xFF, 06, 00, 00, 00, 00, 00, 00, 0xEF}};
 TCOMMAND rec_buff;
@@ -42,13 +43,14 @@ int MP3_send_buffer(TCOMMAND *command){
 	char hex[3];
 	checksum(command);
 	for (uint8_t i = 0; i<10; i++){
-		itoa(command->bytes[i],hex,16);
-		suart_puts(hex);
-		suart_puts(",");
-//		suart_putint(command->bytes[i]);
+//		itoa(command->bytes[i],hex,16);
+//		uart_puts(hex);
+//		uart_puts(",");
+		uart_putc(command->bytes[i]);
+		suart_putint(command->bytes[i]);
 	}
 
-	suart_puts("\r\n");
+//	uart_puts("\r\n");
 	return 1;
 
 }

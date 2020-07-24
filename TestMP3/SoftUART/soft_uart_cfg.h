@@ -12,16 +12,16 @@
 #define USE_RX            1
 #define USE_TX            1
 
-#define SUART_PORT_RX    PORTB
-#define SUART_PIN_RX     PINB
-#define SUART_DDR_RX     DDRB
+#define SUART_PORT_RX    PORTC
+#define SUART_PIN_RX     PINC
+#define SUART_DDR_RX     DDRC
 
-#define SUART_PORT_TX    PORTB
-#define SUART_PIN_TX     PINB
-#define SUART_DDR_TX     DDRB
+#define SUART_PORT_TX    PORTC
+#define SUART_PIN_TX     PINC
+#define SUART_DDR_TX     DDRC
 
-#define    RxD           PB1
-#define    TxD           PB0
+#define    RxD           PC0
+#define    TxD           PC1
 
 
 // definicja iloœci bitów STOP
@@ -35,7 +35,7 @@
 // Table 4-2. Baud Rate Table (str.8)
 
 
-#define b_value 140
+#define b_value 135
 
 //nastaveno na 9600 bey krystalu 140
 
