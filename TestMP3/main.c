@@ -31,11 +31,12 @@ int main(void){
 
 	lcd_str("MP3....");
 	uint16_t pocitadlo = 0;
-	_delay_ms(3000);
+
 	lcd_cls();
 	MP3_init();
 	MP3_command_queery(number_of_track_sd,0);
 	lcdprint_buffer();
+	_delay_ms(2000);
 
 
 	while(1){
@@ -43,10 +44,13 @@ int main(void){
 			lcd_int_al(15,0,pocitadlo,_right);
 			_delay_ms(100);
 			MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
+			lcdprint_buffer();
 			_delay_ms(2000);
 			MP3_play_track_folder(sampl_vyberte_dotaz,folder_info);
+			lcdprint_buffer();
 			_delay_ms(2000);
 			MP3_play_track_folder(sampl_do_konce_ukonceni_zbyva,folder_info);
+			lcdprint_buffer();
 			_delay_ms(2000);
 //			MP3_play_track(pocitadlo);
 			MP3_play_track_folder(59-pocitadlo,folder_minuty);
@@ -58,6 +62,7 @@ int main(void){
 }
 
 void lcdprint_buffer(){
+	lcd_cls();
 	lcd_str("CMD:");
 	lcd_hex(recv_buff.CMD);
 	lcd_locate(1,0);

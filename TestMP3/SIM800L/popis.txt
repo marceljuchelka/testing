@@ -1,0 +1,36 @@
+info na seriove lince
+volani na modul 
+RING
+
++CLIP: "+420608100114",145,"",0,"",0
+
+RING
+
++CLIP: "+420608100114",145,"",0,"",0
+
+RING
+
++CLIP: "+420608100114",145,"",0,"",0
+
+poslani SMS
+AT+CREG?
+Odpovìï musí být +CREG: 0,1
+AT+CMGF=1
+Odpovìï musí být OK.
+AT+CMGS="+420123456789"
+Poèkat znak > (vìtší než)
+Odeslat text: Ahoj, toto je testovaci zprava.
+Poslat CTRL+Z
+Odpovìï musí být: +CMGS: ……
+AT+CMGF=0
+Odpovìï musí být OK.
+
+
+avizo o prichozi zprave
++CMTI: "SM",4
+
+
+
+Pro nastavení režimu psaní SMS zpráv je používán p¡ríkaz AT+CMGF=<mode>.
+• <mode> je 0 – PDU formát
+• <mode> je 1 – textový režim

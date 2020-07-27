@@ -40,7 +40,7 @@ int8_t MP3_play_track_folder(uint8_t track,uint8_t folder){
 }
 int8_t MP3_command(uint8_t command, uint16_t value){
 	uint8_t *swap = (uint8_t*)(&value);
-	send_buff.Feedback = 1;
+	send_buff.Feedback = 0;
 	send_buff.para_H = *(swap+1);
 	send_buff.para_L = *(swap);
 	send_buff.CMD = command;
@@ -53,7 +53,7 @@ uint8_t MP3_command_queery(uint8_t command,uint16_t value){
 	uint8_t znak=0;
 	uint8_t idx=0;
 	uint8_t *swap = (uint8_t*)(&value);
-	send_buff.Feedback = 1;
+	send_buff.Feedback = 0;
 	send_buff.para_H = *(swap+1);
 	send_buff.para_L = *(swap);
 	send_buff.CMD = command;
