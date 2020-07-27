@@ -20,8 +20,8 @@
 #define SUART_PIN_TX     PINC
 #define SUART_DDR_TX     DDRC
 
-#define    RxD           PC0
-#define    TxD           PC1
+#define    RxD           PC1
+#define    TxD           PC0
 
 
 // definicja iloœci bitów STOP
@@ -36,8 +36,6 @@
 
 
 #define b_value 135
-
-//nastaveno na 9600 bey krystalu 140
 
 /*
 ; Some b values:     (See also table in Appnote AVR-305 documentation)

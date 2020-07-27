@@ -38,6 +38,9 @@ void suart_putint( int val ) {
      itoa( val, buf, 10 );
      suart_puts( buf );
 }
+void suart_putc( char val){
+	sputchar (val);
+}
 #endif
 
 
@@ -63,4 +66,6 @@ char * suart_gets( char * buf, uint8_t size ) {
 
     return buf;
 }
+
+
 #endif

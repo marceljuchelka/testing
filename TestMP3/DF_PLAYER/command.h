@@ -20,9 +20,31 @@
 #define reset					0x0C
 #define play					0x0D
 #define pause					0x0E
+#define play_folder				0x0F
+
+//hierarchie SD card
+#define folder_hodiny					02
+#define folder_minuty					03
+#define folder_info						04
+
+
+//informacni samply
+#define sampl_cisteni_ukonceno			0x01
+#define sampl_cleaner_je_vypnut			0x02
+#define sampl_do_konce_ukonceni_zbyva	0x03
+#define sampl_ozone_cleaner_pro			0x04
+#define sampl_vyberte_dotaz				0x05
+#define sampl_dokonce_cisteni			0x06
+#define sampl_cisteni_skonci_za			0x07
+#define sampl_priprava_skoci_za			0x08
+#define sampl_ukonceni_skonci_za		0x09
+
+
 
 //dotazy
-#define number_of_track_sd		0x48		//kolik souboru v root
+#define inicializace			0x3F		//inicializace karty
+#define volume_query				0x43		//Query current volume
+#define number_of_track_sd		0x48		//kolik souboru v SD
 
 
 

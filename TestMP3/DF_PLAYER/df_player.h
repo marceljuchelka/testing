@@ -23,9 +23,16 @@ typedef union{
 	};
 } TCOMMAND;
 
+TCOMMAND send_buff;
+TCOMMAND recv_buff;
+
 int MP3_send_buffer(TCOMMAND *command);
 void checksum (TCOMMAND *command);
 int8_t MP3_play_track(uint16_t track);
 int8_t MP3_command(uint8_t command, uint16_t value);
+int8_t MP3_play_track_folder(uint8_t track,uint8_t folder);
+uint8_t MP3_command_queery(uint8_t command,uint16_t value);
+void MP3_init();
+
 
 #endif /* DF_PLAYER_H_ */
