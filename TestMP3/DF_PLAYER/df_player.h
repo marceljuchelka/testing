@@ -8,6 +8,10 @@
 #ifndef DF_PLAYER_H_
 #define DF_PLAYER_H_
 
+//init nastaveni
+#define volume_init	15			//nastaveni hlasitosti
+#define device_init	1			//TF sdcard
+
 typedef union{
 	uint8_t bytes[10];
 	struct {

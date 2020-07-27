@@ -31,7 +31,7 @@ int8_t MP3_play_track(uint16_t track){
 }
 
 int8_t MP3_play_track_folder(uint8_t track,uint8_t folder){
-	send_buff.Feedback = 0;
+	send_buff.Feedback = 1;
 	send_buff.para_H = folder;
 	send_buff.para_L = track;
 	send_buff.CMD = play_folder;
@@ -40,7 +40,7 @@ int8_t MP3_play_track_folder(uint8_t track,uint8_t folder){
 }
 int8_t MP3_command(uint8_t command, uint16_t value){
 	uint8_t *swap = (uint8_t*)(&value);
-	send_buff.Feedback = 0;
+	send_buff.Feedback = 1;
 	send_buff.para_H = *(swap+1);
 	send_buff.para_L = *(swap);
 	send_buff.CMD = command;
@@ -50,21 +50,22 @@ int8_t MP3_command(uint8_t command, uint16_t value){
 }
 
 uint8_t MP3_command_queery(uint8_t command,uint16_t value){
-//	uint8_t znak=0;
-//	uint8_t idx=0;
+	uint8_t znak=0;
+	uint8_t idx=0;
 	uint8_t *swap = (uint8_t*)(&value);
-	send_buff.Feedback = 0;
+	send_buff.Feedback = 1;
 	send_buff.para_H = *(swap+1);
 	send_buff.para_L = *(swap);
 	send_buff.CMD = command;
 	MP3_send_buffer(&send_buff);
-//	while(idx++<2){
-//		znak = sgetchar();
-//		recv_buff.bytes[idx] = znak;
-//		if(idx>10) {
-//			return 0;
-//		}
-//	}
+//	_delay_ms(200);
+	while(znak!=0xEF){
+	znak = suart_getc();
+		recv_buff.bytes[idx++] = znak;
+		if(idx>10) {
+			break;
+		}
+	}
 	return 1;
 
 }
@@ -86,9 +87,9 @@ int MP3_send_buffer(TCOMMAND *command){
 }
 
 void MP3_init(){
-	MP3_command(device_source,TF);
+	MP3_command(device_source,device_init);
 	_delay_ms(200);
-	MP3_command(volume_level,30);
+	MP3_command(volume_level,volume_init);
 	_delay_ms(200);
 	MP3_command(specify_EQ,_eq_Normal);
 	_delay_ms(100);

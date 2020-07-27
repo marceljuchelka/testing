@@ -20,6 +20,7 @@ void suart_puts( char * str );
 void suart_putint( int val );
 void suart_putc( char val);
 char * suart_gets( char * buf, uint8_t size );
+char suart_getc ();
 
 
 

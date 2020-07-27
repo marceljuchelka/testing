@@ -67,5 +67,11 @@ char * suart_gets( char * buf, uint8_t size ) {
     return buf;
 }
 
+char suart_getc (){
+	char znak;
+	znak = sgetchar();
+	return znak;
 
+
+}
 #endif

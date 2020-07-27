@@ -34,6 +34,8 @@ int main(void){
 	_delay_ms(3000);
 	lcd_cls();
 	MP3_init();
+	MP3_command_queery(number_of_track_sd,0);
+	lcdprint_buffer();
 
 
 	while(1){
