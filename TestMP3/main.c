@@ -24,39 +24,35 @@
 
 int main(void){
 	lcd_init();
-	suart_init();
+
 	uart_init(UART_BAUD_SELECT(9600,8000000UL));\
 	sei();
+	char znak;
+	char tx_buf[]="toto je testovaci text\n\r";
+	char rx_buf[32];
 
-
-	lcd_str("MP3....");
-	uint16_t pocitadlo = 0;
-
+	uart_puts(tx_buf);
+	uint8_t pocetznaku;
 	lcd_cls();
-	MP3_init();
-	MP3_command_queery(number_of_track_sd,0);
-	lcdprint_buffer();
-	_delay_ms(2000);
-
+	lcd_str("start ...");
+	lcd_locate(1,0);
+	lcd_str("Znak:");
 
 	while(1){
-		for(pocitadlo = 0; pocitadlo<60;pocitadlo++){
-			lcd_int_al(15,0,pocitadlo,_right);
-			_delay_ms(100);
-			MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
-			lcdprint_buffer();
-			_delay_ms(2000);
-			MP3_play_track_folder(sampl_vyberte_dotaz,folder_info);
-			lcdprint_buffer();
-			_delay_ms(2000);
-			MP3_play_track_folder(sampl_do_konce_ukonceni_zbyva,folder_info);
-			lcdprint_buffer();
-			_delay_ms(2000);
-//			MP3_play_track(pocitadlo);
-			MP3_play_track_folder(59-pocitadlo,folder_minuty);
+		znak = uart_getc();
 
-			_delay_ms(10000);
+		if(((znak & 0xff00) == 0)) {
+			if (znak& 0x00ff){
+			uart_putc( znak);
+			lcd_char(znak);
 			}
+		}
+
+
+
+
+
+
 
 	}
 }
@@ -70,4 +66,34 @@ void lcdprint_buffer(){
 	lcd_hex(recv_buff.para_H);
 	lcd_str(" DL:");
 	lcd_hex(recv_buff.para_L);
+}
+
+void MP3_test(){
+	suart_init();
+	MP3_init();
+	lcd_str("MP3....");
+	uint16_t pocitadlo = 0;
+	lcd_cls();
+	MP3_init();
+	MP3_command_queery(number_of_track_sd,0);
+	lcdprint_buffer();
+	_delay_ms(2000);
+	for(pocitadlo = 0; pocitadlo<60;pocitadlo++){
+		lcd_int_al(15,0,pocitadlo,_right);
+		_delay_ms(100);
+		MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
+		lcdprint_buffer();
+		_delay_ms(2000);
+		MP3_play_track_folder(sampl_vyberte_dotaz,folder_info);
+		lcdprint_buffer();
+		_delay_ms(2000);
+		MP3_play_track_folder(sampl_do_konce_ukonceni_zbyva,folder_info);
+		lcdprint_buffer();
+		_delay_ms(2000);
+//			MP3_play_track(pocitadlo);
+		MP3_play_track_folder(59-pocitadlo,folder_minuty);
+
+		_delay_ms(10000);
+		}
+
 }

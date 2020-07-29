@@ -28,7 +28,7 @@
 //AT prikazy
 //informacni
 #define GSM_signal			AT+CSQ
-#define
+
 //DTMF
 #define GSM_DTMF_on			AT+DDET=1
 //volani

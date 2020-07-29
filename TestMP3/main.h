@@ -9,6 +9,7 @@
 #define MAIN_H_
 
 void lcdprint_buffer();
+void MP3_test();
 
 
 
