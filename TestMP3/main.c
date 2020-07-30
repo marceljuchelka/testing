@@ -11,6 +11,7 @@
 #include <avr/pgmspace.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include "main.h"
@@ -27,6 +28,7 @@ int main(void){
 
 	uart_init(UART_BAUD_SELECT(9600,8000000UL));\
 	sei();
+	uint8_t pozice = 0;
 	char znak;
 	char tx_buf[]="toto je testovaci text\n\r";
 	char rx_buf[32];
@@ -35,17 +37,23 @@ int main(void){
 	uint8_t pocetznaku;
 	lcd_cls();
 	lcd_str("start ...");
-	lcd_locate(1,0);
-	lcd_str("Znak:");
+	_delay_ms(2000);
+	lcd_cls();
 
 	while(1){
 		znak = uart_getc();
 
 		if(((znak & 0xff00) == 0)) {
 			if (znak& 0x00ff){
-			uart_putc( znak);
-			lcd_char(znak);
-			}
+				rx_buf[pozice] = znak;
+				uart_puts(&rx_buf[pozice]);
+				lcd_char(rx_buf[pozice++]);
+				}
+//			else{
+//				lcd_cls();
+//				lcd_str(rx_buf);
+//				pozice = 0;
+//			}
 		}
 
 
