@@ -21,48 +21,36 @@
 #include "DF_PLAYER/df_player.h"
 #include "DF_PLAYER/command.h"
 #include "UART/uart.h"
+#include "SIM800L/sim800l.h"
+#include "SIM800L/command.h"
 
 
 int main(void){
+
 	lcd_init();
+	lcd_cursor_on();
+
 
 	uart_init(UART_BAUD_SELECT(9600,8000000UL));\
 	sei();
-	uint8_t pozice = 0;
-	char znak;
-	char tx_buf[]="toto je testovaci text\n\r";
-	char rx_buf[32];
 
-	uart_puts(tx_buf);
-	uint8_t pocetznaku;
+//	char tx_buf[]="toto je testovaci text\n\r";
+//	char rx_buf[32];
+	int8_t vysledek = 0;
+
+//	uart_puts(tx_buf);
 	lcd_cls();
 	lcd_str("start ...");
 	_delay_ms(2000);
+	sim800l_init();
 	lcd_cls();
 
 	while(1){
-		znak = uart_getc();
-
-		if(((znak & 0xff00) == 0)) {
-			if (znak& 0x00ff){
-				rx_buf[pozice] = znak;
-				uart_puts(&rx_buf[pozice]);
-				lcd_char(rx_buf[pozice++]);
-				}
-//			else{
-//				lcd_cls();
-//				lcd_str(rx_buf);
-//				pozice = 0;
-//			}
-		}
-
-
-
-
-
-
-
+//		uart_puts(tx_buf);
+		vysledek = sim800l_read();
+		_delay_ms(1000);
 	}
+
 }
 
 void lcdprint_buffer(){

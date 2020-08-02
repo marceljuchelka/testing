@@ -1,5 +1,5 @@
 info na seriove lince
-volani na modul 
+**************************************volani na modul 
 RING
 
 +CLIP: "+420608100114",145,"",0,"",0
@@ -12,7 +12,13 @@ RING
 
 +CLIP: "+420608100114",145,"",0,"",0
 
-poslani SMS
+
+    0d 0a 52 49 4e 47 0d 0a 0d 0a 2b 43 4c 49 50 3a   ..RING....+CLIP: 
+    20 22 2b 34 32 30 36 30 38 31 30 30 31 31 34 22    "+420608100114" 
+    2c 31 34 35 2c 22 22 2c 30 2c 22 22 2c 30 0d 0a   ,145,"",0,"",0.. 
+
+
+***********************************poslani SMS
 AT+CREG?
 Odpovìï musí být +CREG: 0,1
 AT+CMGF=1
@@ -26,11 +32,47 @@ AT+CMGF=0
 Odpovìï musí být OK.
 
 
-avizo o prichozi zprave
-+CMTI: "SM",4
 
 
+
+
+*******************************************prichod DTMF
+poslat  AT+DDET=1 				nastavit pro prichod DTMF
+
++DTMF: 1						zacina 0d0a a konci 0d0a
+
++DTMF: 2
+
++DTMF: 3
+
+    20 20 20 20 20 20 2e 2e 2b 44 54 4d 46 3a 20 33         ..+DTMF: 3 
+
+po kazdem prikazu je 0D0A (enter)
+
+**********************************avizo o prichozi zprave
++CMTI: "SM",1
 
 Pro nastavení režimu psaní SMS zpráv je používán p¡ríkaz AT+CMGF=<mode>.
 • <mode> je 0 – PDU formát
 • <mode> je 1 – textový režim
+
+poslat AT+CMGF=1    nastavi textovy rezim
+AT+CNMI=0,0			zakaze avizo o zprave
+
+
+********************************************cteni SMS
+
+prichozi SMS
+AT+CMGR=1			precist sms c1
++CMGR: "REC READ","+420608100114","","20/07/31,14:46:17+08"
++420608100114 init
+
+AT+CMGL="ALL"		precti vsechny sms pred tim musi byt prepnuto do textoveho rezimu
+
+    0d 0d 0a 2b 43 4d 47 52 3a 20 22 52 45 43 20 52   ...+CMGR: "REC R 
+    45 41 44 22 2c 22 2b 34 32 30 36 30 38 31 30 30   EAD","+420608100 
+    31 31 34 22 2c 22 22 2c 22 32 30 2f 30 38 2f 30   114","","20/08/0 
+    32 2c 31 37 3a 30 33 3a 31 39 2b 30 38 22 0d 0a   2,17:03:19+08".. 
+    2b 34 32 30 36 30 38 31 30 30 31 31 34 20 69 6e   +420608100114 in 
+    69 74 0d 0a 0d 0a 4f 4b 0d 0a                     it....OK..       
+
