@@ -50,7 +50,7 @@ return 0;
 int8_t sim800l_select_command(char *rx_string,uint8_t hlavicka){
 
 	if(hlavicka == H_RING) sim800l_ringign(rx_string);
-	if(hlavicka == H_DTMF) sim800l_dtmf(rx_string);
+	if(hlavicka == H_DTMF) sim800l_dtmf_select(rx_string);
 	if(hlavicka == H_CMGR) sim800l_sms(rx_string);
 
 	return 1;
@@ -67,20 +67,37 @@ int8_t sim800l_ringign(char *rx_string){
 	return -1;
 }
 
-int8_t sim800l_dtmf (char *rx_string){
-	char dtmf_select = 0;
-	parse_string(rx_string,pars_dtfm,&dtmf_select);
+int8_t sim800l_dtmf_select (char *rx_string){
+	char dtmf_select_val = 0;
+	char *ptr;
+	ptr = strstr_P(rx_string,head_from_sim[H_DTMF]);
+	dtmf_select_val = (*(ptr+7) - 48);
 	lcd_cls();
-	lcd_str_al(0,0,"dtmf",_left);
-	lcd_int_al(1,0,dtmf_select,_left);
+	lcd_str_al(0,0,"dtmf = ",_left);
+	lcd_int(dtmf_select_val);
+
+	if (dtmf_select_val>=0 && dtmf_select_val <10) return dtmf_select_val;
+
 	return -1;
 }
 
 int8_t sim800l_sms(char *rx_string){
-	char tel_num_sms[15];
-	parse_string(rx_string+10,pars_sms,tel_num_sms);
+	char 	tel_num_sms[15] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+	char	tel_num_init[15]= "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+	char *ptr_init;
+	ptr_init = (strstr(rx_string,pars_tel_sms));					//najde parsovaci retezec
+	strncpy(tel_num_sms,(ptr_init+3),13);								//zkopiruje sms telefon do telnumsms
+	ptr_init = (strstr((rx_string+56),tel_num_sms));					//najde parsovaci retezec pro telef z SMS
+//	strncpy(tel_num_init,(ptr_init+2),13);								//zkopiruje sms telefon do telnuminit
+
+
+	//	parse_string(rx_string+10,pars_sms,tel_num_sms);
+
+
 	lcd_cls();
-	lcd_str_al(0,0,"telefon sms",_left);
+	lcd_str_al(0,15,"ini",_right);
+	lcd_str_al(1,15,"sms",_right);
+	lcd_str_al(0,0,ptr_init,_left);
 	lcd_str_al(1,0,tel_num_sms,_left);
 
 
@@ -95,7 +112,7 @@ int8_t parse_string(char *rx_string,char *splitter, char *navrat){
 	ptr = strtok(NULL,splitter);
 	if(strcmp(splitter,pars_telnum) == 0) strcpy(navrat,ptr);
 	if(strcmp(splitter,pars_sms) == 0) strcpy(navrat,ptr);
-	if(strcmp(splitter,pars_dtfm) == 0) strcpy(navrat,ptr);
+
 
 //	uart_puts(ptr);
 //	uart_putc('\n');
@@ -106,15 +123,18 @@ int8_t parse_string(char *rx_string,char *splitter, char *navrat){
 int8_t sim800l_read_uart(char *buf){
 	uint16_t error_znak;
 	uint8_t pozice = 0;
-	while(pozice<100){
+	while(pozice<128){
 		error_znak = uart_getc();
-		if(error_znak& 0xFF00) return -1;
-		*(buf+pozice) = (char)error_znak;
-//		uart_putc(*(buf+pozice));
-		if(*(buf+pozice-1) == 0x0d && *(buf+pozice) == 0x0a) {
-			*(buf+pozice+1) = '\0';
+		if(error_znak& 0xFF00) {
+			*(buf+pozice) = 0;
 			return strlen(buf);
 		}
+		*(buf+pozice) = (char)error_znak;
+//		uart_putc(*(buf+pozice));
+//		if(*(buf+pozice-1) == 0x0d && *(buf+pozice) == 0x0a) {
+//			*(buf+pozice+1) = '\0';
+//			return strlen(buf);
+//		}
 		pozice++;
 	}
 return 0;

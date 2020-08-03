@@ -18,7 +18,7 @@ int8_t sim800_msg_head(char *message);
 void sim800l_tel_num_write(char *telnum);
 int8_t sim800l_ringign(char *rx_string);
 int8_t sim800l_tel_num_check(char *telnum);
-int8_t sim800l_dtmf (char *rx_string);
+int8_t sim800l_dtmf_select (char *rx_string);
 int8_t sim800l_sms(char *rx_string);
 
 typedef union {

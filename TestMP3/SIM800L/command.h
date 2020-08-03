@@ -39,5 +39,8 @@
 #define 		pars_telnum		"\""	//	",\""	//zjisteni telef. cisla
 #define 		pars_dtfm		" "		//dtmf volba
 #define 		pars_sms		",\""	//sms volba
+#define 		pars_tel_sms	"\",\""	//sms telefon
+#define 		pars_tel_init	"\r\n"	//telefon s init
+
 
 #endif /* COMMAND_H_ */
