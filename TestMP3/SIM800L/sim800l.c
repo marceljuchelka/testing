@@ -21,8 +21,8 @@ const PROGMEM char head_from_sim[][10]={
 		{"NO CARRIER"},{"+DTMF:"},{"+CMGR:"},{"RING"},{"+CMTI:"},{"+CLIP:"}
 };
 
-EEMEM	char tel_number_init[15] = {"0420608100114"};
-		char tel_number[15] = {"0420608100114"};
+EEMEM	char tel_number_init[] = {"+420608111111"};
+		char tel_number[] = {"+420608111111"};
 
 
 
@@ -59,7 +59,8 @@ int8_t sim800l_select_command(char *rx_string,uint8_t hlavicka){
 
 int8_t sim800l_ringign(char *rx_string){
 	char tel_num_ring[15];
-	parse_string(rx_string,pars_telnum,tel_num_ring);
+//	parse_string(rx_string,pars_telnum,tel_num_ring);
+
 	lcd_cls();
 	lcd_str_al(0,0,"telefon ring",_left);
 	lcd_str_al(1,0,tel_num_ring,_left);
@@ -83,13 +84,13 @@ int8_t sim800l_dtmf_select (char *rx_string){
 
 int8_t sim800l_sms(char *rx_string){
 	char 	tel_num_sms[15] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
-	char	tel_num_init[15]= "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+//	char	tel_num_init[15]= "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
 	char *ptr_init;
 	ptr_init = (strstr(rx_string,pars_tel_sms));					//najde parsovaci retezec
 	strncpy(tel_num_sms,(ptr_init+3),13);								//zkopiruje sms telefon do telnumsms
-	ptr_init = (strstr((rx_string+56),tel_num_sms));					//najde parsovaci retezec pro telef z SMS
+	ptr_init = (strstr((rx_string+32),tel_num_sms));					//zkontroluje jestli se rovna telefon z SMS a obsahu SMS
 //	strncpy(tel_num_init,(ptr_init+2),13);								//zkopiruje sms telefon do telnuminit
-
+	if(ptr_init >0) sim800l_tel_num_write(tel_num_sms);
 
 	//	parse_string(rx_string+10,pars_sms,tel_num_sms);
 
