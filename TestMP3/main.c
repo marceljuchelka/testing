@@ -34,11 +34,6 @@ int main(void){
 	uart_init(UART_BAUD_SELECT(9600,8000000UL));\
 	sei();
 
-//	char tx_buf[]="toto je testovaci text\n\r";
-//	char rx_buf[32];
-	int8_t vysledek = 0;
-
-//	uart_puts(tx_buf);
 	lcd_cls();
 	lcd_str("start ...");
 	_delay_ms(2000);
@@ -46,8 +41,7 @@ int main(void){
 	lcd_cls();
 
 	while(1){
-//		uart_puts(tx_buf);
-		vysledek = sim800l_read();
+		sim800l_read();
 		_delay_ms(1000);
 	}
 
