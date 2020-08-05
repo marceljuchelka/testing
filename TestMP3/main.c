@@ -20,9 +20,9 @@
 #include "SoftUART/soft_uart.h"
 #include "DF_PLAYER/df_player.h"
 #include "DF_PLAYER/command.h"
+#include "SIM800L/sim_command.h"
 #include "UART/uart.h"
 #include "SIM800L/sim800l.h"
-#include "SIM800L/command.h"
 
 
 int main(void){
@@ -31,7 +31,7 @@ int main(void){
 	lcd_cursor_on();
 
 
-	uart_init(UART_BAUD_SELECT(9600,8000000UL));\
+	uart_init(UART_BAUD_SELECT(9600,8000000UL));
 	sei();
 
 	lcd_cls();

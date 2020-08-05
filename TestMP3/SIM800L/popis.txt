@@ -75,7 +75,7 @@ poslat  AT+DDET=1 				nastavit pro prichod DTMF
 po kazdem prikazu je 0D0A (enter)
 
 **********************************avizo o prichozi zprave
-+CMTI: "SM",1
++CMTI: "SM",1				+CMTI: "SM",1$0d$0a
 
 Pro nastavení režimu psaní SMS zpráv je používán p¡ríkaz AT+CMGF=<mode>.
 • <mode> je 0 – PDU formát
