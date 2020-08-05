@@ -47,9 +47,9 @@ void sim800l_init(){
 int8_t sim800l_read(){							//navrat commandu
 	int8_t len, hlavicka;
 	char rx_buf[128];
-	len = sim800l_read_uart(rx_buf);
-	if(len!=-1){
-		hlavicka = sim800l_msg_head(rx_buf);
+	len = sim800l_read_uart(rx_buf);				//nacte data z UARTu
+	if(len!=-1){									//neni li nic tak skoci nazpet
+		hlavicka = sim800l_msg_head(rx_buf);		//zjisti podle hlavicky o jakou informaci jde
 		sim800l_select_command(rx_buf,hlavicka);
 		//		sim800l_select_command(rx_buf);
 //		parse_string(rx_buf);
@@ -58,7 +58,7 @@ int8_t sim800l_read(){							//navrat commandu
 return 0;
 }
 
-int8_t sim800l_msg_head(char *message){						//zjisteni hlavicky sms
+int8_t sim800l_msg_head(char *message){						//zjisteni hlavicky dat z SIM800l
 	char select_string[20];
 	strncpy(select_string,message,19);
 	char *head;
