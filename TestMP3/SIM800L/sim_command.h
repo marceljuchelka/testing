@@ -34,9 +34,9 @@
 #define 		H_NO_C		 	0
 #define 		H_DTMF			1
 #define 		H_CMGR			2
-#define 		H_RING			3		//info o volani
+#define 		H_CLIP			3		//info o volani
 #define 		H_CMTI			4		//info o prichozi SMS
-#define 		H_CLIP			5
+#define 		H_RING			5
 
 //parsovaci oddelovace
 #define 		pars_telnum		"\""	//	",\""	//zjisteni telef. cisla
@@ -48,5 +48,8 @@
 //bezpecnostni stringy
 #define 		SMS_init		"init "	//co se musi napsat do inicializacni sms je treba ulozit
 
+//DTMF prikazy
+#define  	dtmf_time_end			00			//mluvi kolik zbyva do konce a jaky proces
+#define 	dtmf_machine_OFF		01			//vypne stroj
 
 #endif /* SIM_COMMAND_H_ */

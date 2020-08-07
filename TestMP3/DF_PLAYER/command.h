@@ -42,15 +42,17 @@
 
 
 //dotazy
-#define inicializace			0x3F		//inicializace karty
+#define inicializace				0x3F		//inicializace karty
 #define volume_query				0x43		//Query current volume
-#define number_of_track_sd		0x48		//kolik souboru v SD
+#define number_of_track_sd			0x48		//kolik souboru v SD
 
 
 
 enum {_eq_Normal,_eq_Pop,Rock,_eq_Jazz,_eq_Classic,Base};
 enum {play_repeat,play_folder_repeat,play_single_repeat,play_random};
 enum {U,TF,AUX,SLEEP,FLASH};
+
+
 
 
 #endif /* COMMAND_H_ */

@@ -16,10 +16,13 @@
 #include "../UART/uart.h"
 #include "../MK_LCD/mk_lcd44780.h"
 #include "sim_command.h"
+#include "../DF_PLAYER/command.h"
+#include "../DF_PLAYER/df_player.h"
 
+extern volatile uint8_t sekundy, proces;
 
 const PROGMEM char head_from_sim[][15]={
-		{"NO CARRIER"},{"+DTMF:"},{"+CMGR:"},{"RING"},{"+CMTI:"},{"+CLIP:"}
+		{"NO CARRIER"},{"+DTMF:"},{"+CMGR:"},{"+CLIP:"},{"+CMTI:"},{"RING"}
 };
 
 EEMEM	char tel_number_init[15] = {"+420608111111"};
@@ -27,27 +30,25 @@ EEMEM	char tel_number_init[15] = {"+420608111111"};
 
 
 
-void sim800l_init(){
-	sim800l_at_com_send(GSM_init,1);	//inicializace
-//	_delay_ms(200);
-//	uart_puts(GSM_init);			//inicializace
-//	_delay_ms(200);
-	sim800l_at_com_send(GSM_text_mode,1);	//prepnuti na textove SMS
-//	_delay_ms(200);
-	sim800l_at_com_send(GSM_DTMF_on,1);	//zapni prijem DTMF
-//	_delay_ms(200);
-	sim800l_at_com_send(GSM_sms_del_all,1);			//smazat vsechny sms
-//	_delay_ms(200);
-	sim800l_at_com_send(GSM_signal,1);			//signal gsm?
-//	_delay_ms(200);
+int8_t sim800l_init(){
+
+	if(sim800l_at_com_send(GSM_init,1)== -1) return - 1;				//inicializace
+
+
+	sim800l_at_com_send(GSM_text_mode,1);								//prepnuti na textove SMS
+	sim800l_at_com_send(GSM_DTMF_on,1);									//zapni prijem DTMF
+	sim800l_at_com_send(GSM_sms_del_all,1);								//smazat vsechny sms
+	sim800l_at_com_send(GSM_signal,1);									//signal gsm?
 	sim800l_at_com_send(GSM_echo_off,1);
+	sim800l_at_com_send(GSM_micr_gain,0);
+return 0;
 }
 
 
 int8_t sim800l_read(){							//navrat commandu
 	lcd_str_al(0,15,"  ",_right);
 	int8_t len, hlavicka;
-	char rx_buf[128];
+	char rx_buf[129];
 	len = sim800l_read_uart(rx_buf);				//nacte data z UARTu
 	if(len!=-1){									//neni li nic tak skoci nazpet
 		hlavicka = sim800l_msg_head(rx_buf);		//zjisti podle hlavicky o jakou informaci jde
@@ -80,7 +81,7 @@ int8_t sim800l_msg_head(char *message){						//zjisteni hlavicky dat z SIM800l
 
 int8_t sim800l_select_command(char *rx_string,uint8_t hlavicka){
 	if(hlavicka == H_NO_C)	lcd_str_al(0,0,"polozeno",_left);
-	if(hlavicka == H_RING) sim800l_ringign(rx_string);
+	if(hlavicka == H_CLIP) sim800l_ringign(rx_string);
 	if(hlavicka == H_DTMF) sim800l_dtmf_select(rx_string);
 	if(hlavicka == H_CMGR) sim800l_sms(rx_string);
 	if(hlavicka == H_CMTI) sim800l_sms_info(rx_string);
@@ -99,6 +100,12 @@ int8_t sim800l_ringign(char *rx_string){
 	lcd_str_al(0,0,"calling",_left);
 	lcd_str_al(1,0,tel_num_compare,_left);
 	sim800l_at_com_send(GSM_zvedni_hovor,0);
+	sim800l_read_uart(rx_string);									//aby vyprazdnil uart
+	_delay_ms(300);
+	MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
+	_delay_ms(2000);
+	MP3_play_track_folder(sampl_vyberte_dotaz,folder_info);
+
 	return 1;
 	}
 	else lcd_str_al(0,0,"call non autor",_left);
@@ -114,9 +121,23 @@ int8_t sim800l_dtmf_select (char *rx_string){									//zjisteni DTMF volby
 	lcd_str_al(0,0,"dtmf =   ",_left);
 	lcd_int_al(0,7,dtmf_select_val,_left);
 
-	if (dtmf_select_val>=0 && dtmf_select_val <10) return dtmf_select_val;
+	if (dtmf_select_val>=0 && dtmf_select_val <10) sim800l_dtmf_command(dtmf_select_val);
 
 	return -1;
+}
+
+int8_t sim800l_dtmf_command(uint8_t dtmf_val){
+	if(dtmf_val==dtmf_time_end){
+		MP3_play_track_folder(proces+7,folder_info);
+		_delay_ms(2000);
+		MP3_play_track_folder(sekundy,folder_minuty);
+		lcd_int_al(1,0,proces,_left);
+		lcd_int_al(1,4,sekundy,_left);
+	}
+	if(dtmf_val == dtmf_machine_OFF){
+		MP3_play_track_folder(sampl_cleaner_je_vypnut,folder_info);
+	}
+return -1;
 }
 
 int8_t sim800l_sms_info(char *rx_string){
@@ -132,7 +153,7 @@ int8_t sim800l_sms(char *rx_string){					//inicializacni SMS musi byt ve tvaru "
 	tel_num_sms[13]= 0x20;
 	lcd_str_al(0,0,tel_num_sms,_left);
 	sim800l_read_uart(rx_string);
-	ptr_init = (strstr((rx_string),tel_num_sms));					//zkontroluje jestli se rovna telefon z SMS a obsahu SMS
+	ptr_init = (strstr((rx_string),tel_num_sms+4));					//zkontroluje jestli se rovna telefon z SMS a obsahu SMS
 	if(ptr_init >0) {
 		strlwr(rx_string);
 		ptr_init = (strstr((rx_string),SMS_init));					//zkontroluje jestli se rovna init z SMS a obsahu SMS
@@ -150,8 +171,8 @@ int8_t sim800l_sms(char *rx_string){					//inicializacni SMS musi byt ve tvaru "
 int8_t sim800l_read_uart(char *buf){		//precte buff uartu. je li konec tak posle len buferu kdyy nic tak -1
 	uint16_t error_znak;
 	uint8_t pozice = 0;
-	lcd_str_al(1,15,"   ",_right);
-	while(pozice<127){
+//	lcd_str_al(1,15,"   ",_right);
+	while(pozice<128){
 		error_znak = uart_getc();			//int s chybou
 		if((error_znak& 0xFF00) && (pozice == 0)) {			//filtruji chybu
 				return -1;
@@ -159,9 +180,10 @@ int8_t sim800l_read_uart(char *buf){		//precte buff uartu. je li konec tak posle
 		*(buf+pozice) = (char)error_znak;
 //		uart_putc(*(buf+pozice));								//echo
 		if((*(buf+pozice) == '\n' && *(buf+pozice-1) == '\r')){		//||*(buf+pozice) == 0 *(buf+pozice-1) == 0x0d) &&
+			*(buf+pozice+1) = '\0';
 			return pozice;
 		}
-		lcd_int_al(1,15,pozice,_right);
+//		lcd_int_al(1,15,pozice,_right);
 		if(*(buf+pozice)>0)	pozice++;
 
 	}
@@ -177,21 +199,23 @@ void sim800l_tel_num_write(char *telnum){
 
 int8_t sim800l_at_com_send(char *command, uint8_t ansver){
 	char buf[20];
-	int8_t len = 0;
+//	int8_t len = 0;
 	strcpy(buf,command);
 //	lcd_str_al(0,0,buf+3,_left);
 	strcat(buf,"\r\n\0");
 	uart_puts(buf);
 	if(ansver == 1){
-//		_delay_ms(100);
-		while (sim800l_read_uart(buf) == -1);
-		len = sim800l_read_uart(buf);
+		_delay_ms(100);
+//		while (sim800l_read_uart(buf) == -1);
 		sim800l_read_uart(buf);
-//		if (strstr(buf,"OK\r\n")) lcd_str_al(1,0,"OK",_left);
-//		lcd_int_al(1,0,len,_left);
+//		sim800l_read_uart(buf);
+		if (strstr(buf,"OK")) return 1;
+		if (strstr(buf,"ERROR")) return -1;
 	}
 
-return 1;
+return 0;
 }
 
-
+int8_t sim800l_sms_send(char* tel_num, char *text){
+	return -1;
+}

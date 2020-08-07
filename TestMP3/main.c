@@ -24,25 +24,46 @@
 #include "UART/uart.h"
 #include "SIM800L/sim800l.h"
 
+volatile uint8_t sekundy=1, proces=1;
+
 
 int main(void){
 
 	lcd_init();
 	lcd_cursor_on();
+	suart_init();
+	MP3_init();
 
 
 	uart_init(UART_BAUD_SELECT(9600,8000000UL));
 	sei();
-
+	MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
 	lcd_cls();
-	lcd_str("start ...");
+	lcd_str("start");
 	_delay_ms(2000);
-	sim800l_init();
-	lcd_cls();
+	if(sim800l_init() == -1){
+		lcd_cls();
+		lcd_str("neni modul");
+		while(1);
+	}
+
+
+
 
 	while(1){
+		sekundy--;
+		lcd_int_al(0,12,sekundy,_right);
+		if(sekundy<10)lcd_int_al(0,11,0,_right);
+		lcd_int_al(0,9,proces,_right);
 		sim800l_read();
+
+
 		_delay_ms(1000);
+		if(sekundy == 0) {
+			proces++;
+			if (proces==3)proces = 0;
+			sekundy = 60;
+		}
 	}
 
 }
