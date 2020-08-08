@@ -100,7 +100,7 @@ int8_t sim800l_ringign(char *rx_string){
 	lcd_str_al(0,0,"calling",_left);
 	lcd_str_al(1,0,tel_num_compare,_left);
 	sim800l_at_com_send(GSM_zvedni_hovor,0);
-	sim800l_read_uart(rx_string);									//aby vyprazdnil uart
+	while ((sim800l_read_uart(rx_string))> -1);									//aby vyprazdnil uart
 	_delay_ms(300);
 	MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
 	_delay_ms(2000);
@@ -131,8 +131,6 @@ int8_t sim800l_dtmf_command(uint8_t dtmf_val){
 		MP3_play_track_folder(proces+7,folder_info);
 		_delay_ms(2000);
 		MP3_play_track_folder(sekundy,folder_minuty);
-		lcd_int_al(1,0,proces,_left);
-		lcd_int_al(1,4,sekundy,_left);
 	}
 	if(dtmf_val == dtmf_machine_OFF){
 		MP3_play_track_folder(sampl_cleaner_je_vypnut,folder_info);
