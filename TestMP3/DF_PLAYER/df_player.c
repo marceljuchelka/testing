@@ -31,8 +31,9 @@ int8_t MP3_play_track(uint16_t track){
 }
 
 int8_t MP3_play_track_folder(uint8_t track,uint8_t folder){
-	send_buff.Feedback = 1;
+	send_buff.Feedback = 0;
 	send_buff.para_H = folder;
+	if(track == 0) track = 99;
 	send_buff.para_L = track;
 	send_buff.CMD = play_folder;
 	MP3_send_buffer(&send_buff);

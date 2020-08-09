@@ -27,7 +27,8 @@
 #define GSM_text_mode		"AT+CMGF=1"		//rezim psani SMS
 #define GSM_sms_read1		"AT+CMGR=1"		//cteni SMS + cislo
 #define GSM_sms_del_all		"AT+CMGD=1,4"		//smazani vsech sms
-#define GSN_sms_del_all1	"AT+CMGL=\"ALL\""	//smazani vsech sms
+#define GSM_sms_del_all1	"AT+CMGL=\"ALL\""	//smazani vsech sms
+#define GSM_send_sms_num	"AT+CMGS=\""		//posli sms na telefon 420xxxyyyzzz bez +
 
 //hlavicky z SIM800L
 
@@ -48,8 +49,10 @@
 //bezpecnostni stringy
 #define 		SMS_init		"init "	//co se musi napsat do inicializacni sms je treba ulozit
 
-//DTMF prikazy
-#define  	dtmf_time_end			00			//mluvi kolik zbyva do konce a jaky proces
-#define 	dtmf_machine_OFF		01			//vypne stroj
+//DTMF prikazy pod kterym cislem DTMF je jaky prikaz
+#define 	dtmf_machine_OFF		10			//vypne stroj
+#define  	dtmf_time_end			01			//mluvi kolik zbyva do konce a jaky proces
+#define 	dtmf_sms_on_off			03			//zapnuti sms
+
 
 #endif /* SIM_COMMAND_H_ */

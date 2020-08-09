@@ -9,7 +9,7 @@
 #define DF_PLAYER_H_
 
 //init nastaveni
-#define volume_init 	25						//nastaveni hlasitosti
+#define volume_init 	30						//nastaveni hlasitosti
 #define device_init		1						//TF sdcard
 #define pin_busy 		PC2						//pin pripojeny na busy vystup MP3
 #define MP3_ready		(1<<pin_busy)			//makro  je li 1 je ready

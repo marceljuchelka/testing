@@ -100,11 +100,17 @@ int8_t sim800l_ringign(char *rx_string){
 	lcd_str_al(0,0,"calling",_left);
 	lcd_str_al(1,0,tel_num_compare,_left);
 	sim800l_at_com_send(GSM_zvedni_hovor,0);
-	while ((sim800l_read_uart(rx_string))> -1);									//aby vyprazdnil uart
 	_delay_ms(300);
 	MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
 	_delay_ms(2000);
 	MP3_play_track_folder(sampl_vyberte_dotaz,folder_info);
+	_delay_ms(2000);
+	MP3_play_track_folder(menu_cleaner_off,folder_menu);
+	while ((sim800l_read_uart(rx_string))> -1);							//aby vyprazdnil uart
+	_delay_ms(3000);
+	MP3_play_track_folder(menu_proces_minut,folder_menu);
+	_delay_ms(4000);
+	MP3_play_track_folder(menu_SMS_info_on,folder_menu);
 
 	return 1;
 	}
@@ -127,6 +133,7 @@ int8_t sim800l_dtmf_select (char *rx_string){									//zjisteni DTMF volby
 }
 
 int8_t sim800l_dtmf_command(uint8_t dtmf_val){
+	if(dtmf_val == 0) dtmf_val = 10;
 	if(dtmf_val==dtmf_time_end){
 		MP3_play_track_folder(proces+7,folder_info);
 		_delay_ms(2000);
@@ -134,6 +141,10 @@ int8_t sim800l_dtmf_command(uint8_t dtmf_val){
 	}
 	if(dtmf_val == dtmf_machine_OFF){
 		MP3_play_track_folder(sampl_cleaner_je_vypnut,folder_info);
+	}
+	if(dtmf_val == dtmf_sms_on_off){
+		MP3_play_track_folder(sampl_info_sms_on_off,folder_info);
+//		sim800l_sms_send("+420608100114","text\26\0");
 	}
 return -1;
 }
@@ -215,5 +226,17 @@ return 0;
 }
 
 int8_t sim800l_sms_send(char* tel_num, char *text){
+	char buf[23];
+	strcpy(buf,GSM_send_sms_num);
+	eeprom_read_block(buf+9,tel_number_init,13);
+	*(buf+21) = '\"';
+	*(buf+22) = '\0';
+	sim800l_at_com_send(buf,0);
+	uart_puts(text);
+	_delay_ms(50);
+
+
+
+
 	return -1;
 }

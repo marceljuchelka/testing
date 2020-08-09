@@ -26,9 +26,10 @@
 #define folder_hodiny					02
 #define folder_minuty					03
 #define folder_info						04
+#define folder_menu						05
 
 
-//informacni samply
+//informacni samply folder info
 #define sampl_cisteni_ukonceno			0x01
 #define sampl_cleaner_je_vypnut			0x02
 #define sampl_do_konce_ukonceni_zbyva	0x03
@@ -38,6 +39,12 @@
 #define sampl_cisteni_skonci_za			0x07
 #define sampl_priprava_skoci_za			0x08
 #define sampl_ukonceni_skonci_za		0x09
+#define sampl_info_sms_on_off			10
+
+//menu samply
+#define menu_cleaner_off				10
+#define menu_proces_minut				1
+#define menu_SMS_info_on				2
 
 
 

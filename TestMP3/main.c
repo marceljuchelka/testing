@@ -38,6 +38,7 @@ int main(void){
 	uart_init(UART_BAUD_SELECT(9600,8000000UL));
 	sei();
 	MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
+	_delay_ms(2000);
 	lcd_cls();
 	lcd_str("start");
 	_delay_ms(2000);
