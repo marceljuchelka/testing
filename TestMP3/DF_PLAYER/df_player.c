@@ -71,6 +71,7 @@ uint8_t MP3_command_queery(uint8_t command,uint16_t value){
 
 }
 
+//odeslani bufferu do MP3 modulu
 int MP3_send_buffer(TCOMMAND *command){
 //	char hex[3];
 	checksum(command);
@@ -87,6 +88,7 @@ int MP3_send_buffer(TCOMMAND *command){
 
 }
 
+//inicializace MP3 modulu
 void MP3_init(){
 	MP3_command(device_source,device_init);
 	_delay_ms(200);
@@ -105,3 +107,27 @@ void checksum (TCOMMAND *command){
 		*swap = *(swap+1);
 		*(swap+1) = i;
 }
+// nacita pozadavky na prehrani mp3 samplu a pak je prehrava pri kazdem zavolani s 0,0
+//kontroluje MP3 BUSY pin jestli je 1 pak je mozno prehrat dalsi sampl
+//buffer je na 10 pozadavku
+int8_t MP3_queue_FIFO_play(uint8_t track, uint8_t folder){			//fifo zasobnik na odesilani samlu pozdeji
+	static uint8_t buf_track[10], buf_folder[10];					//je li track folder 0 znamena prehrat
+	static uint8_t receive_ptr = 0,send_ptr = 0;								// je li vetsi nez 0 znamena ulozit
+	if (track > 0 && folder >0){									// uloz do fifo
+		buf_track[receive_ptr] = track;
+		buf_folder[receive_ptr] = folder;
+		if(++receive_ptr == 10) receive_ptr = 0;
+	}
+	else {
+		if(buf_track[send_ptr]>0 && buf_folder[send_ptr]>0 && (PINC& MP3_ready)){		//je li zasobnik vetsi nez 0 pin na MP3 pripraven
+			MP3_play_track_folder(buf_track[send_ptr], buf_folder[send_ptr]);			//prehraj
+			buf_track[send_ptr] = 0;													//vynuluj
+			buf_folder[send_ptr] = 0;
+			if(++send_ptr == 10) send_ptr = 0;											//je li 10 tak je 0
+		}																				//jinak preskoc
+	}
+
+	return -1;
+
+}
+

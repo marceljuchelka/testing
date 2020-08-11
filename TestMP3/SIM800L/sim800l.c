@@ -101,16 +101,12 @@ int8_t sim800l_ringign(char *rx_string){
 	lcd_str_al(1,0,tel_num_compare,_left);
 	sim800l_at_com_send(GSM_zvedni_hovor,0);
 	_delay_ms(300);
-	MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
-	_delay_ms(2000);
-	MP3_play_track_folder(sampl_vyberte_dotaz,folder_info);
-	_delay_ms(2000);
-	MP3_play_track_folder(menu_cleaner_off,folder_menu);
+	MP3_queue_FIFO_play(sampl_ozone_cleaner_pro,folder_info);
+	MP3_queue_FIFO_play(sampl_vyberte_dotaz,folder_info);
+	MP3_queue_FIFO_play(menu_cleaner_off,folder_menu);
 	while ((sim800l_read_uart(rx_string))> -1);							//aby vyprazdnil uart
-	_delay_ms(3000);
-	MP3_play_track_folder(menu_proces_minut,folder_menu);
-	_delay_ms(4000);
-	MP3_play_track_folder(menu_SMS_info_on,folder_menu);
+	MP3_queue_FIFO_play(menu_proces_minut,folder_menu);
+	MP3_queue_FIFO_play(menu_SMS_info_on,folder_menu);
 
 	return 1;
 	}

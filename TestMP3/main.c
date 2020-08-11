@@ -57,7 +57,7 @@ int main(void){
 		if(sekundy<10)lcd_int_al(0,11,0,_right);
 		lcd_int_al(0,9,proces,_right);
 		sim800l_read();
-
+		MP3_queue_FIFO_play(0,0);
 
 		_delay_ms(1000);
 		if(sekundy == 0) {
