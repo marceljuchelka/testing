@@ -128,18 +128,18 @@ int8_t sim800l_dtmf_select (char *rx_string){									//zjisteni DTMF volby
 	return -1;
 }
 
-int8_t sim800l_dtmf_command(uint8_t dtmf_val){
+int8_t sim800l_dtmf_command(uint8_t dtmf_val){					//vykonani dtmf prikazu
 	if(dtmf_val == 0) dtmf_val = 10;
 	if(dtmf_val==dtmf_time_end){
-		MP3_play_track_folder(proces+7,folder_info);
-		_delay_ms(2000);
-		MP3_play_track_folder(sekundy,folder_minuty);
+		MP3_queue_FIFO_play(proces+7,folder_info);
+//		_delay_ms(2000);
+		MP3_queue_FIFO_play(sekundy,folder_minuty);
 	}
 	if(dtmf_val == dtmf_machine_OFF){
-		MP3_play_track_folder(sampl_cleaner_je_vypnut,folder_info);
+		MP3_queue_FIFO_play(sampl_cleaner_je_vypnut,folder_info);
 	}
 	if(dtmf_val == dtmf_sms_on_off){
-		MP3_play_track_folder(sampl_info_sms_on_off,folder_info);
+		MP3_queue_FIFO_play(sampl_info_sms_on_off,folder_info);
 //		sim800l_sms_send("+420608100114","text\26\0");
 	}
 return -1;
