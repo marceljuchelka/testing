@@ -24,16 +24,18 @@ int main (void){
 	DDRD|=(LED);
 	DDRB|=(PCB_LED);
 	TCCR0A|=(1<<COM0A1) | (1<<WGM00) |(1<<WGM01);
-	TCCR0B|=(CS00)| (1<<CS02);
+	TCCR0B|=(CS00)| (1<<CS01);
 
 	while(1){
-		for(a=255;a>125;a--){
-			OCR0A=a;
+		a=255;
+		while(a>0){
+			OCR0A=a--;
 		_delay_ms(10);
 		}
 		PORTB ^=PCB_LED;
-		for(b=125;b<256;b++){
-			OCR0A=b;
+		b=0;
+		while(b<255){
+			OCR0A=b++;
 		_delay_ms(10);
 		}
 
