@@ -27,12 +27,12 @@ int main (void){
 	TCCR0B|=(CS00)| (1<<CS02);
 
 	while(1){
-		for(a=255;a>0;a--){
+		for(a=255;a>125;a--){
 			OCR0A=a;
 		_delay_ms(10);
 		}
 		PORTB ^=PCB_LED;
-		for(b=0;b<256;b++){
+		for(b=125;b<256;b++){
 			OCR0A=b;
 		_delay_ms(10);
 		}
