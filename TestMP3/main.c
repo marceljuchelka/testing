@@ -25,6 +25,7 @@
 #include "SIM800L/sim800l.h"
 
 volatile uint8_t sekundy=1, proces=1;
+const char build_info[] PROGMEM = "Build: " __DATE__ ";" __TIME__;
 
 
 int main(void){
