@@ -40,12 +40,16 @@ int main(void){
 	MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
 	_delay_ms(2000);
 	lcd_cls();
-	lcd_str("start");
-	_delay_ms(5000);
+	lcd_str("kontrola modulu");
+	uint8_t i=0;
 	while(!(PORTC& (1<<PC3))) {
-		if(sim800l_init() == 0) break;
+		lcd_int_al(1,0,i++,_left);
+		_delay_ms(5000);
+		if(sim800l_init() == 0){
+			lcd_str_al_P(1,5,"modul OK",_left);
+			break;
+		}
 	}
-
 	while(1){
 		sekundy--;
 		lcd_int_al(0,12,sekundy,_right);
