@@ -29,28 +29,22 @@ const char build_info[] PROGMEM = "Build: " __DATE__ ";" __TIME__;
 
 
 int main(void){
-
+	DDRC|= DIR_conv;
+	PORTC&=~DIR_conv;
 	lcd_init();
 	lcd_cursor_on();
 	suart_init();
-	MP3_init();
-
-
 	uart_init(UART_BAUD_SELECT(9600,8000000UL));
 	sei();
+	MP3_init();
 	MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
 	_delay_ms(2000);
 	lcd_cls();
 	lcd_str("start");
-	_delay_ms(2000);
-	if(sim800l_init() == -1){
-		lcd_cls();
-		lcd_str("neni modul");
-		while(1);
+	_delay_ms(5000);
+	while(!(PORTC& (1<<PC3))) {
+		if(sim800l_init() == 0) break;
 	}
-
-
-
 
 	while(1){
 		sekundy--;
@@ -67,7 +61,6 @@ int main(void){
 			sekundy = 60;
 		}
 	}
-
 }
 
 void lcdprint_buffer(){

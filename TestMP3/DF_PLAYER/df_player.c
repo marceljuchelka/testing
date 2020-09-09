@@ -15,6 +15,7 @@
 #include "command.h"
 #include "../SoftUART/soft_uart.h"
 #include "../UART/uart.h"
+#include "../main.h"
 
 TCOMMAND send_buff = {{0x7E, 0xFF, 06, 00, 00, 00, 00, 00, 00, 0xEF}};
 TCOMMAND recv_buff;
@@ -75,6 +76,7 @@ uint8_t MP3_command_queery(uint8_t command,uint16_t value){
 int MP3_send_buffer(TCOMMAND *command){
 //	char hex[3];
 	checksum(command);
+	PORTC|= DIR_conv;
 	for (uint8_t i = 0; i<10; i++){
 //		itoa(command->bytes[i],hex,16);
 //		uart_puts(hex);
@@ -82,7 +84,7 @@ int MP3_send_buffer(TCOMMAND *command){
 //		uart_putc(command->bytes[i]);
 		suart_putc(command->bytes[i]);
 	}
-
+	PORTC&=~DIR_conv;
 //	uart_puts("\r\n");
 	return 1;
 

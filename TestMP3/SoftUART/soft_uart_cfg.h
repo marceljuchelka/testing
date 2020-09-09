@@ -9,7 +9,7 @@
 #ifndef SOF_UART_CFG_
 #define SOF_UART_CFG_
 
-#define USE_RX            1
+#define USE_RX            0
 #define USE_TX            1
 
 #define SUART_PORT_RX    PORTC

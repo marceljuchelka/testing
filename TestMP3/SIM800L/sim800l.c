@@ -18,6 +18,7 @@
 #include "sim_command.h"
 #include "../DF_PLAYER/command.h"
 #include "../DF_PLAYER/df_player.h"
+#include "../main.h"
 
 extern volatile uint8_t sekundy, proces;
 
@@ -31,10 +32,7 @@ EEMEM	char tel_number_init[15] = {"+420608111111"};
 
 
 int8_t sim800l_init(){
-
 	if(sim800l_at_com_send(GSM_init,1)== -1) return - 1;				//inicializace
-
-
 	sim800l_at_com_send(GSM_text_mode,1);								//prepnuti na textove SMS
 	sim800l_at_com_send(GSM_DTMF_on,1);									//zapni prijem DTMF
 	sim800l_at_com_send(GSM_sms_del_all,1);								//smazat vsechny sms
@@ -208,7 +206,12 @@ int8_t sim800l_at_com_send(char *command, uint8_t ansver){
 	strcpy(buf,command);
 //	lcd_str_al(0,0,buf+3,_left);
 	strcat(buf,"\r\n\0");
+	PORTC|= DIR_conv;
 	uart_puts(buf);
+	while(1){
+		if (!(UCSR0B& (1<<UDRIE0))) break;
+	}
+	PORTC&= ~DIR_conv;
 	if(ansver == 1){
 		_delay_ms(100);
 //		while (sim800l_read_uart(buf) == -1);
