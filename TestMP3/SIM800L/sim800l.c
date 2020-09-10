@@ -174,6 +174,7 @@ int8_t sim800l_sms(char *rx_string){					//inicializacni SMS musi byt ve tvaru "
 int8_t sim800l_read_uart(char *buf){		//precte buff uartu. je li konec tak posle len buferu kdyy nic tak -1
 	uint16_t error_znak;
 	uint8_t pozice = 0;
+//	uint32_t delay = 0;
 //	lcd_str_al(1,15,"   ",_right);
 	while(pozice<128){
 		error_znak = uart_getc();			//int s chybou
@@ -213,9 +214,9 @@ int8_t sim800l_at_com_send(char *command, uint8_t ansver){
 	}
 	PORTC&= ~DIR_conv;
 	if(ansver == 1){
-		_delay_ms(100);
+		_delay_ms(10);
 //		while (sim800l_read_uart(buf) == -1);
-		sim800l_read_uart(buf);
+		if(sim800l_read_uart(buf) == -1) return -1;
 //		sim800l_read_uart(buf);
 		if (strstr(buf,"OK")) return 1;
 		if (strstr(buf,"ERROR")) return -1;

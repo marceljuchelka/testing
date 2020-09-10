@@ -42,12 +42,14 @@ int main(void){
 	lcd_cls();
 	lcd_str("kontrola modulu");
 	uint8_t i=0;
-	while(!(PORTC& (1<<PC3))) {
-		lcd_int_al(1,0,i++,_left);
-		_delay_ms(5000);
-		if(sim800l_init() == 0){
-			lcd_str_al_P(1,5,"modul OK",_left);
-			break;
+	if(!(PORTC& (1<<PC3))){
+		while(1) {
+			lcd_int_al(1,0,i++,_left);
+			_delay_ms(1000);
+			if(sim800l_init() == 0){
+				lcd_str_al_P(1,5,"modul OK",_left);
+				break;
+			}
 		}
 	}
 	while(1){
