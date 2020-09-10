@@ -32,7 +32,9 @@ EEMEM	char tel_number_init[15] = {"+420608111111"};
 
 
 int8_t sim800l_init(){
-	if(sim800l_at_com_send(GSM_init,1)== -1) return - 1;				//inicializace
+	while(sim800l_at_com_send(GSM_init,1)== -1){
+		_delay_ms(1000);				//inicializace
+	}
 	sim800l_at_com_send(GSM_text_mode,1);								//prepnuti na textove SMS
 	sim800l_at_com_send(GSM_DTMF_on,1);									//zapni prijem DTMF
 	sim800l_at_com_send(GSM_sms_del_all,1);								//smazat vsechny sms
@@ -78,7 +80,10 @@ int8_t sim800l_msg_head(char *message){						//zjisteni hlavicky dat z SIM800l
 }
 
 int8_t sim800l_select_command(char *rx_string,uint8_t hlavicka){
-	if(hlavicka == H_NO_C)	lcd_str_al(0,0,"polozeno",_left);
+	if(hlavicka == H_NO_C)	{
+		lcd_str_al(0,0,"polozeno",_left);
+		MP3_queue_FIFO_play(0,255);
+	}
 	if(hlavicka == H_CLIP) sim800l_ringign(rx_string);
 	if(hlavicka == H_DTMF) sim800l_dtmf_select(rx_string);
 	if(hlavicka == H_CMGR) sim800l_sms(rx_string);
@@ -94,17 +99,20 @@ int8_t sim800l_ringign(char *rx_string){
 //	parse_string(rx_string,pars_telnum,tel_num_ring);
 	eeprom_read_block(tel_num_compare,tel_number_init,sizeof(tel_number_init));
 	if (strstr(rx_string,tel_num_compare)) {
+//		while ((sim800l_read_uart(rx_string))> -1);							//aby vyprazdnil uart
 	lcd_cls();
 	lcd_str_al(0,0,"calling",_left);
 	lcd_str_al(1,0,tel_num_compare,_left);
 	sim800l_at_com_send(GSM_zvedni_hovor,0);
-	_delay_ms(300);
+	_delay_ms(100);
+//	MP3_queue_FIFO_play(0,255);
 	MP3_queue_FIFO_play(sampl_ozone_cleaner_pro,folder_info);
-	MP3_queue_FIFO_play(sampl_vyberte_dotaz,folder_info);
 	MP3_queue_FIFO_play(menu_cleaner_off,folder_menu);
-	while ((sim800l_read_uart(rx_string))> -1);							//aby vyprazdnil uart
 	MP3_queue_FIFO_play(menu_proces_minut,folder_menu);
 	MP3_queue_FIFO_play(menu_SMS_info_on,folder_menu);
+	MP3_queue_FIFO_play(sampl_vyberte_dotaz,folder_info);
+
+
 
 	return 1;
 	}
@@ -149,7 +157,8 @@ int8_t sim800l_sms_info(char *rx_string){
 }
 
 int8_t sim800l_sms(char *rx_string){					//inicializacni SMS musi byt ve tvaru "init +420608100114 init" (bez uvozovek)
-	char 	tel_num_sms[15] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+	char 	tel_num_sms[15]; // = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+	for(uint8_t i=0;i<15; i++) tel_num_sms[i]=0;
 	char *ptr_init;
 	ptr_init = (strstr(rx_string,pars_tel_sms));					//najde parsovaci retezec
 	strncpy(tel_num_sms,(ptr_init+3),13);						//zkopiruje sms telefon do telnumsms
@@ -178,7 +187,7 @@ int8_t sim800l_read_uart(char *buf){		//precte buff uartu. je li konec tak posle
 //	lcd_str_al(1,15,"   ",_right);
 	while(pozice<128){
 		error_znak = uart_getc();			//int s chybou
-		if((error_znak& 0xFF00) && (pozice == 0)) {			//filtruji chybu
+		if((error_znak& UART_NO_DATA) && (pozice == 0)) {			//filtruji chybu
 				return -1;
 		}
 		*(buf+pozice) = (char)error_znak;
@@ -208,13 +217,15 @@ int8_t sim800l_at_com_send(char *command, uint8_t ansver){
 //	lcd_str_al(0,0,buf+3,_left);
 	strcat(buf,"\r\n\0");
 	PORTC|= DIR_conv;
+	_delay_ms(3);
 	uart_puts(buf);
 	while(1){
 		if (!(UCSR0B& (1<<UDRIE0))) break;
 	}
+	_delay_ms(10);
 	PORTC&= ~DIR_conv;
 	if(ansver == 1){
-		_delay_ms(10);
+//		_delay_ms(100);
 //		while (sim800l_read_uart(buf) == -1);
 		if(sim800l_read_uart(buf) == -1) return -1;
 //		sim800l_read_uart(buf);

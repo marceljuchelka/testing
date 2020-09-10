@@ -29,6 +29,9 @@ const char build_info[] PROGMEM = "Build: " __DATE__ ";" __TIME__;
 
 
 int main(void){
+
+//	DDRC = 0;
+//	PORTC = 0;
 	DDRC|= DIR_conv;
 	PORTC&=~DIR_conv;
 	lcd_init();
@@ -39,19 +42,25 @@ int main(void){
 	MP3_init();
 	MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
 	_delay_ms(2000);
-	lcd_cls();
-	lcd_str("kontrola modulu");
 	uint8_t i=0;
-	if(!(PORTC& (1<<PC3))){
+	PORTC|= (1<<PC3);
+	if(!(PINC& (1<<PC3))){
+		lcd_cls();
+		lcd_str("kontrola modulu");
 		while(1) {
-			lcd_int_al(1,0,i++,_left);
-			_delay_ms(1000);
+			_delay_ms(5000);
+
 			if(sim800l_init() == 0){
-				lcd_str_al_P(1,5,"modul OK",_left);
+				lcd_str_al(1,5,"modul OK",_left);
+				lcd_cls();
 				break;
 			}
+			lcd_int_al(1,0,i++,_left);
 		}
 	}
+	else lcd_str("neni modul");
+	_delay_ms(2000);
+
 	while(1){
 		sekundy--;
 		lcd_int_al(0,12,sekundy,_right);

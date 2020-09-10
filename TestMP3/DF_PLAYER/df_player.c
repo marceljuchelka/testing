@@ -115,6 +115,9 @@ void checksum (TCOMMAND *command){
 int8_t MP3_queue_FIFO_play(uint8_t track, uint8_t folder){			//fifo zasobnik na odesilani samlu pozdeji
 	static uint8_t buf_track[10], buf_folder[10];					//je li track folder 0 znamena prehrat
 	static uint8_t receive_ptr = 0,send_ptr = 0;								// je li vetsi nez 0 znamena ulozit
+	if(folder==255){
+		send_ptr = receive_ptr;
+	}
 	if (track > 0 && folder >0){									// uloz do fifo
 		buf_track[receive_ptr] = track;
 		buf_folder[receive_ptr] = folder;
