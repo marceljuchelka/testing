@@ -33,17 +33,39 @@ EEMEM	char tel_number_init[15] = {"+420608111111"};
 
 int8_t sim800l_init(){
 	while(sim800l_at_com_send(GSM_init,1)== -1){
-		_delay_ms(1000);				//inicializace
+		_delay_ms(500);				//inicializace
 	}
-	sim800l_at_com_send(GSM_text_mode,1);								//prepnuti na textove SMS
-	sim800l_at_com_send(GSM_DTMF_on,1);									//zapni prijem DTMF
-	sim800l_at_com_send(GSM_sms_del_all,1);								//smazat vsechny sms
-	sim800l_at_com_send(GSM_signal,1);									//signal gsm?
-	sim800l_at_com_send(GSM_echo_off,1);
+	sim800l_at_com_send(GSM_text_mode,0);								//prepnuti na textove SMS
+	sim800l_at_com_send(GSM_DTMF_on,0);									//zapni prijem DTMF
+	sim800l_at_com_send(GSM_sms_del_all,0);								//smazat vsechny sms
+	sim800l_at_com_send(GSM_signal,0);									//signal gsm?
+	sim800l_at_com_send(GSM_echo_off,0);
 	sim800l_at_com_send(GSM_micr_gain,0);
 return 0;
 }
 
+int8_t sim800l_check(){
+	DDRB&= ~(1<<PB2);
+//	PORTC|= (1<<PC3);
+	if(!(PINB& (1<<PB2))){
+//		PORTC&=~(1<<PC3);
+		lcd_cls();
+		lcd_str("kontrola modulu");
+		while(1) {
+			_delay_ms(5000);
+			if(sim800l_init() == 0){
+				lcd_str_al(1,5,"modul OK",_left);
+				lcd_cls();
+				return 1;
+			}
+		}
+	}
+	else
+	lcd_str("neni modul");
+//	PORTC&=~(1<<PC3);
+//	_delay_ms(2000);
+	return 0;
+}
 
 int8_t sim800l_read(){							//navrat commandu
 	lcd_str_al(0,15,"  ",_right);
@@ -83,29 +105,41 @@ int8_t sim800l_select_command(char *rx_string,uint8_t hlavicka){
 	if(hlavicka == H_NO_C)	{
 		lcd_str_al(0,0,"polozeno",_left);
 		MP3_queue_FIFO_play(0,255);
+		return 1;
 	}
-	if(hlavicka == H_CLIP) sim800l_ringign(rx_string);
-	if(hlavicka == H_DTMF) sim800l_dtmf_select(rx_string);
-	if(hlavicka == H_CMGR) sim800l_sms(rx_string);
-	if(hlavicka == H_CMTI) sim800l_sms_info(rx_string);
-
+	if(hlavicka == H_CLIP) {
+		sim800l_ringign(rx_string);
+		return 1;
+	}
+	if(hlavicka == H_DTMF) {
+		sim800l_dtmf_select(rx_string);
+		return 1;
+	}
+	if(hlavicka == H_CMGR) {
+		sim800l_sms(rx_string);
+		return 1;
+	}
+	if(hlavicka == H_CMTI) {sim800l_sms_info(rx_string);
 	return 1;
+	}
+	return 0;
 }
 
 
 
 int8_t sim800l_ringign(char *rx_string){
 	char tel_num_compare[15];
+	lcd_cls();
+//	lcd_str_al(0,0,"calling",_left);
 //	parse_string(rx_string,pars_telnum,tel_num_ring);
 	eeprom_read_block(tel_num_compare,tel_number_init,sizeof(tel_number_init));
 	if (strstr(rx_string,tel_num_compare)) {
-//		while ((sim800l_read_uart(rx_string))> -1);							//aby vyprazdnil uart
-	lcd_cls();
-	lcd_str_al(0,0,"calling",_left);
 	lcd_str_al(1,0,tel_num_compare,_left);
 	sim800l_at_com_send(GSM_zvedni_hovor,0);
+	lcd_str_al(0,0,"zvednuto",_left);
 	_delay_ms(100);
-//	MP3_queue_FIFO_play(0,255);
+	while ((sim800l_read_uart(rx_string))> -1);							//aby vyprazdnil uart
+	MP3_queue_FIFO_play(0,255);
 	MP3_queue_FIFO_play(sampl_ozone_cleaner_pro,folder_info);
 	MP3_queue_FIFO_play(menu_cleaner_off,folder_menu);
 	MP3_queue_FIFO_play(menu_proces_minut,folder_menu);
@@ -116,7 +150,7 @@ int8_t sim800l_ringign(char *rx_string){
 
 	return 1;
 	}
-	else lcd_str_al(0,0,"call non autor",_left);
+	else lcd_str_al(0,1,"call non autor",_left);
 	return -1;
 }
 
@@ -163,7 +197,7 @@ int8_t sim800l_sms(char *rx_string){					//inicializacni SMS musi byt ve tvaru "
 	ptr_init = (strstr(rx_string,pars_tel_sms));					//najde parsovaci retezec
 	strncpy(tel_num_sms,(ptr_init+3),13);						//zkopiruje sms telefon do telnumsms
 	tel_num_sms[13]= 0x20;
-	lcd_str_al(0,0,tel_num_sms,_left);
+//	lcd_str_al(0,0,tel_num_sms,_left);
 	sim800l_read_uart(rx_string);
 	ptr_init = (strstr((rx_string),tel_num_sms+4));					//zkontroluje jestli se rovna telefon z SMS a obsahu SMS
 	if(ptr_init >0) {
@@ -172,7 +206,7 @@ int8_t sim800l_sms(char *rx_string){					//inicializacni SMS musi byt ve tvaru "
 		if(ptr_init >0){
 			tel_num_sms[13] = 0;
 			sim800l_tel_num_write(tel_num_sms);
-			lcd_str_al(15,0,"in",_right);
+			lcd_str_al(1,15,"in",_right);
 			lcd_str_al(1,0,tel_num_sms,_left);
 		}
 	}
@@ -222,7 +256,7 @@ int8_t sim800l_at_com_send(char *command, uint8_t ansver){
 	while(1){
 		if (!(UCSR0B& (1<<UDRIE0))) break;
 	}
-	_delay_ms(10);
+	_delay_ms(3);
 	PORTC&= ~DIR_conv;
 	if(ansver == 1){
 //		_delay_ms(100);

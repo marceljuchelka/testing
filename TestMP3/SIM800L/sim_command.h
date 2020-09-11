@@ -32,7 +32,7 @@
 
 //hlavicky z SIM800L
 
-#define 		H_NO_C		 	0
+#define 		H_NO_C		 	0		//ukonceni hovoru
 #define 		H_DTMF			1
 #define 		H_CMGR			2
 #define 		H_CLIP			3		//info o volani

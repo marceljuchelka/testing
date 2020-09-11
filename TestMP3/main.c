@@ -37,29 +37,13 @@ int main(void){
 	lcd_init();
 	lcd_cursor_on();
 	suart_init();
-	uart_init(UART_BAUD_SELECT(9600,8000000UL));
+	uart_init(UART_BAUD_SELECT(38400,8000000UL));
 	sei();
 	MP3_init();
 	MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
 	_delay_ms(2000);
-	uint8_t i=0;
-	PORTC|= (1<<PC3);
-	if(!(PINC& (1<<PC3))){
-		lcd_cls();
-		lcd_str("kontrola modulu");
-		while(1) {
-			_delay_ms(5000);
+	sim800l_check();
 
-			if(sim800l_init() == 0){
-				lcd_str_al(1,5,"modul OK",_left);
-				lcd_cls();
-				break;
-			}
-			lcd_int_al(1,0,i++,_left);
-		}
-	}
-	else lcd_str("neni modul");
-	_delay_ms(2000);
 
 	while(1){
 		sekundy--;

@@ -16,6 +16,7 @@
 #include "../SoftUART/soft_uart.h"
 #include "../UART/uart.h"
 #include "../main.h"
+#include "../SIM800L/sim800l.h"
 
 TCOMMAND send_buff = {{0x7E, 0xFF, 06, 00, 00, 00, 00, 00, 00, 0xEF}};
 TCOMMAND recv_buff;
@@ -116,7 +117,12 @@ int8_t MP3_queue_FIFO_play(uint8_t track, uint8_t folder){			//fifo zasobnik na 
 	static uint8_t buf_track[10], buf_folder[10];					//je li track folder 0 znamena prehrat
 	static uint8_t receive_ptr = 0,send_ptr = 0;								// je li vetsi nez 0 znamena ulozit
 	if(folder==255){
-		send_ptr = receive_ptr;
+		for (uint8_t i = 0;i<10;i++){
+			buf_folder[i]=0;
+			buf_track[i]=0;
+			receive_ptr = 0;
+			send_ptr = 0;
+		}
 	}
 	if (track > 0 && folder >0){									// uloz do fifo
 		buf_track[receive_ptr] = track;
