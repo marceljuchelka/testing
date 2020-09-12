@@ -25,7 +25,9 @@
 #include "SIM800L/sim800l.h"
 
 volatile uint8_t sekundy=1, proces=1;
-const char build_info[] PROGMEM = "Build: " __DATE__ ";" __TIME__;
+PROGMEM const char build_info[] = "Build:";
+PROGMEM const char build_date[] = __DATE__;
+PROGMEM const char build_time[] = __TIME__;
 
 
 int main(void){
@@ -41,6 +43,10 @@ int main(void){
 	sei();
 	MP3_init();
 	MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
+	lcd_cls();
+	lcd_str_al_P(0,0,build_info,_left);
+	lcd_str_al_P(0,15,build_time,_right);
+	lcd_str_al_P(1,15,build_date,_right);
 	_delay_ms(2000);
 	sim800l_check();
 

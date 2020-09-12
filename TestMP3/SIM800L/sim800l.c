@@ -32,25 +32,30 @@ EEMEM	char tel_number_init[15] = {"+420608111111"};
 
 
 int8_t sim800l_init(){
-	while(sim800l_at_com_send(GSM_init,1)== -1){
-		_delay_ms(500);				//inicializace
+	while(sim800l_at_com_send(GSM_init,1)== -1){				//inicializace
 	}
 	sim800l_at_com_send(GSM_text_mode,0);								//prepnuti na textove SMS
+	_delay_ms(100);
 	sim800l_at_com_send(GSM_DTMF_on,0);									//zapni prijem DTMF
+	_delay_ms(100);
 	sim800l_at_com_send(GSM_sms_del_all,0);								//smazat vsechny sms
+	_delay_ms(100);
 	sim800l_at_com_send(GSM_signal,0);									//signal gsm?
+	_delay_ms(100);
 	sim800l_at_com_send(GSM_echo_off,0);
+	_delay_ms(100);
 	sim800l_at_com_send(GSM_micr_gain,0);
+	while(!(uart_getc()& 0xFF00));
 return 0;
 }
 
 int8_t sim800l_check(){
 	DDRB&= ~(1<<PB2);
-//	PORTC|= (1<<PC3);
 	if(!(PINB& (1<<PB2))){
-//		PORTC&=~(1<<PC3);
 		lcd_cls();
-		lcd_str("kontrola modulu");
+		lcd_str_al(0,0,"modul pripojen",_left);
+		_delay_ms(2000);
+		lcd_str_al(0,6,"kontrola",_left);
 		while(1) {
 			_delay_ms(5000);
 			if(sim800l_init() == 0){
@@ -77,6 +82,7 @@ int8_t sim800l_read(){							//navrat commandu
 		sim800l_select_command(rx_buf,hlavicka);
 		//		sim800l_select_command(rx_buf);
 //		parse_string(rx_buf);
+//		while(!(uart_getc()& 0xFF00));
 	}
 	else {
 		lcd_str_al(0,15,"RK",_right);
@@ -135,16 +141,19 @@ int8_t sim800l_ringign(char *rx_string){
 	eeprom_read_block(tel_num_compare,tel_number_init,sizeof(tel_number_init));
 	if (strstr(rx_string,tel_num_compare)) {
 	lcd_str_al(1,0,tel_num_compare,_left);
+	MP3_queue_FIFO_play(0,255);
 	sim800l_at_com_send(GSM_zvedni_hovor,0);
+	while(!(uart_getc()& 0xFF00));
 	lcd_str_al(0,0,"zvednuto",_left);
 	_delay_ms(100);
-	while ((sim800l_read_uart(rx_string))> -1);							//aby vyprazdnil uart
-	MP3_queue_FIFO_play(0,255);
+
 	MP3_queue_FIFO_play(sampl_ozone_cleaner_pro,folder_info);
 	MP3_queue_FIFO_play(menu_cleaner_off,folder_menu);
 	MP3_queue_FIFO_play(menu_proces_minut,folder_menu);
 	MP3_queue_FIFO_play(menu_SMS_info_on,folder_menu);
 	MP3_queue_FIFO_play(sampl_vyberte_dotaz,folder_info);
+//	while ((sim800l_read_uart(rx_string))> -1);							//aby vyprazdnil uart
+
 
 
 
@@ -221,7 +230,7 @@ int8_t sim800l_read_uart(char *buf){		//precte buff uartu. je li konec tak posle
 //	lcd_str_al(1,15,"   ",_right);
 	while(pozice<128){
 		error_znak = uart_getc();			//int s chybou
-		if((error_znak& UART_NO_DATA) && (pozice == 0)) {			//filtruji chybu
+		if((error_znak& 0xFF00) && (pozice == 0)) {			//filtruji chybu
 				return -1;
 		}
 		*(buf+pozice) = (char)error_znak;
@@ -250,13 +259,15 @@ int8_t sim800l_at_com_send(char *command, uint8_t ansver){
 	strcpy(buf,command);
 //	lcd_str_al(0,0,buf+3,_left);
 	strcat(buf,"\r\n\0");
+	lcd_str_al(1,0,buf,_left);
+//	_delay_ms(1000);
 	PORTC|= DIR_conv;
-	_delay_ms(3);
+	_delay_ms(1);
 	uart_puts(buf);
 	while(1){
 		if (!(UCSR0B& (1<<UDRIE0))) break;
 	}
-	_delay_ms(3);
+	_delay_ms(1);
 	PORTC&= ~DIR_conv;
 	if(ansver == 1){
 //		_delay_ms(100);

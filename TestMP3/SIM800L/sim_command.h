@@ -11,9 +11,10 @@
 
 //AT prikazy
 //informacni
-#define GSM_signal			"AT+CSQ"
-#define GSM_init			"AT"
-#define GSM_echo_off		"ATE0"
+#define GSM_reg_net			"AT+CREG?"		//je modul pripojen k siti?
+#define GSM_signal			"AT+CSQ"		//sila signalu
+#define GSM_init			"AT"			//komunikace s modulem
+#define GSM_echo_off		"ATE0"			//vypnuti opakovani AT prikazu
 
 //DTMF
 #define GSM_DTMF_on			"AT+DDET=1"		//povolit DTMF
