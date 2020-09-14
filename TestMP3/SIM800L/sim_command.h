@@ -47,6 +47,8 @@
 #define 		pars_tel_sms	"\",\""	//sms telefon
 #define 		pars_tel_init	"\r\n"	//telefon s init
 
+#define 		ctrl_z			0x1A	//ukoncovaci znak na konci sms
+
 //bezpecnostni stringy
 #define 		SMS_init		"init "	//co se musi napsat do inicializacni sms je treba ulozit
 

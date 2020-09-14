@@ -32,21 +32,28 @@ EEMEM	char tel_number_init[15] = {"+420608111111"};
 
 
 int8_t sim800l_init(){
-	while(sim800l_at_com_send(GSM_init,1)== -1){				//inicializace
+	while(sim800l_at_com_send(GSM_init,1)== -1);				//inicializace
+
+	while (sim800l_at_com_send(GSM_text_mode,1) == -1){								//prepnuti na textove SMS
+	_delay_ms(100);
 	}
-	sim800l_at_com_send(GSM_text_mode,0);								//prepnuti na textove SMS
+	while (sim800l_at_com_send(GSM_DTMF_on,1) == -1){									//zapni prijem DTMF
 	_delay_ms(100);
-	sim800l_at_com_send(GSM_DTMF_on,0);									//zapni prijem DTMF
+	}
+	while (sim800l_at_com_send(GSM_sms_del_all,1) == -1){								//smazat vsechny sms
 	_delay_ms(100);
-	sim800l_at_com_send(GSM_sms_del_all,0);								//smazat vsechny sms
+	}
+	while (sim800l_at_com_send(GSM_signal,1) == -1){									//signal gsm?
 	_delay_ms(100);
-	sim800l_at_com_send(GSM_signal,0);									//signal gsm?
+	}
+	while (sim800l_at_com_send(GSM_echo_off,1) == -1){
 	_delay_ms(100);
-	sim800l_at_com_send(GSM_echo_off,0);
-	_delay_ms(100);
-	sim800l_at_com_send(GSM_micr_gain,0);
+	}
+	while (sim800l_at_com_send(GSM_micr_gain,1) == -1){
+		_delay_ms(100);
+	}
 	while(!(uart_getc()& 0xFF00));
-return 0;
+	return 0;
 }
 
 int8_t sim800l_check(){
@@ -109,7 +116,7 @@ int8_t sim800l_msg_head(char *message){						//zjisteni hlavicky dat z SIM800l
 
 int8_t sim800l_select_command(char *rx_string,uint8_t hlavicka){
 	if(hlavicka == H_NO_C)	{
-		lcd_str_al(0,0,"polozeno",_left);
+		lcd_str_al(0,0,"pol",_left);
 		MP3_queue_FIFO_play(0,255);
 		return 1;
 	}
@@ -140,26 +147,22 @@ int8_t sim800l_ringign(char *rx_string){
 //	parse_string(rx_string,pars_telnum,tel_num_ring);
 	eeprom_read_block(tel_num_compare,tel_number_init,sizeof(tel_number_init));
 	if (strstr(rx_string,tel_num_compare)) {
-	lcd_str_al(1,0,tel_num_compare,_left);
-	MP3_queue_FIFO_play(0,255);
-	sim800l_at_com_send(GSM_zvedni_hovor,0);
-	while(!(uart_getc()& 0xFF00));
-	lcd_str_al(0,0,"zvednuto",_left);
-	_delay_ms(100);
+		lcd_str_al(1,0,tel_num_compare,_left);
+		MP3_queue_FIFO_play(0,255);
+		sim800l_at_com_send(GSM_zvedni_hovor,0);
+		while(!(uart_getc()& 0xFF00));
+		lcd_str_al(0,0,"up",_left);
+		_delay_ms(100);
 
-	MP3_queue_FIFO_play(sampl_ozone_cleaner_pro,folder_info);
-	MP3_queue_FIFO_play(menu_cleaner_off,folder_menu);
-	MP3_queue_FIFO_play(menu_proces_minut,folder_menu);
-	MP3_queue_FIFO_play(menu_SMS_info_on,folder_menu);
-	MP3_queue_FIFO_play(sampl_vyberte_dotaz,folder_info);
-//	while ((sim800l_read_uart(rx_string))> -1);							//aby vyprazdnil uart
-
-
-
-
-	return 1;
+		MP3_queue_FIFO_play(sampl_ozone_cleaner_pro,folder_info);
+		MP3_queue_FIFO_play(menu_cleaner_off,folder_menu);
+		MP3_queue_FIFO_play(menu_proces_minut,folder_menu);
+		MP3_queue_FIFO_play(menu_SMS_info_on,folder_menu);
+		MP3_queue_FIFO_play(sampl_vyberte_dotaz,folder_info);
+	//	while ((sim800l_read_uart(rx_string))> -1);							//aby vyprazdnil uart
+		return 1;
 	}
-	else lcd_str_al(0,1,"call non autor",_left);
+	else lcd_str_al(0,1,"cna",_left);										//neautorizovane volani
 	return -1;
 }
 
@@ -169,8 +172,8 @@ int8_t sim800l_dtmf_select (char *rx_string){									//zjisteni DTMF volby
 	ptr = strstr_P(rx_string,head_from_sim[H_DTMF]);
 	dtmf_select_val = (*(ptr+7) - 48);
 
-	lcd_str_al(0,0,"dtmf =   ",_left);
-	lcd_int_al(0,7,dtmf_select_val,_left);
+	lcd_str_al(0,0,"dt  ",_left);
+	lcd_int_al(0,4,dtmf_select_val,_left);
 
 	if (dtmf_select_val>=0 && dtmf_select_val <10) sim800l_dtmf_command(dtmf_select_val);
 
@@ -178,6 +181,7 @@ int8_t sim800l_dtmf_select (char *rx_string){									//zjisteni DTMF volby
 }
 
 int8_t sim800l_dtmf_command(uint8_t dtmf_val){					//vykonani dtmf prikazu
+	MP3_queue_FIFO_play(0,255);
 	if(dtmf_val == 0) dtmf_val = 10;
 	if(dtmf_val==dtmf_time_end){
 		MP3_queue_FIFO_play(proces+7,folder_info);
@@ -191,7 +195,10 @@ int8_t sim800l_dtmf_command(uint8_t dtmf_val){					//vykonani dtmf prikazu
 		MP3_queue_FIFO_play(sampl_info_sms_on_off,folder_info);
 //		sim800l_sms_send("+420608100114","text\26\0");
 	}
-return -1;
+//	if(dtmf_val == 4){
+//		sim800l_sms_send(tel_number_init,"abc");
+//	}
+	return -1;
 }
 
 int8_t sim800l_sms_info(char *rx_string){
@@ -254,7 +261,7 @@ void sim800l_tel_num_write(char *telnum){
 }
 
 int8_t sim800l_at_com_send(char *command, uint8_t ansver){
-	char buf[20];
+	char buf[27];
 //	int8_t len = 0;
 	strcpy(buf,command);
 //	lcd_str_al(0,0,buf+3,_left);
@@ -282,17 +289,19 @@ return 0;
 }
 
 int8_t sim800l_sms_send(char* tel_num, char *text){
-	char buf[23];
-	strcpy(buf,GSM_send_sms_num);
-	eeprom_read_block(buf+9,tel_number_init,13);
-	*(buf+21) = '\"';
-	*(buf+22) = '\0';
+	char buf[27];
+	strcpy(buf,GSM_send_sms_num);							//do buf at prikaz
+	eeprom_read_block(buf+9,tel_number_init+1,13);			//dale prida tel cislo bez +
+	buf[21]='\"';								// ukonci uvozovkami
+
 	sim800l_at_com_send(buf,0);
+	lcd_str_al(0,0,buf,_left);
+	lcd_str_al(1,0,buf+16,_left);
+	_delay_ms(200);
 	uart_puts(text);
-	_delay_ms(50);
 
-
-
-
+	_delay_ms(1000);
+	lcd_str_al(0,0,text,_left);
+	uart_putc(ctrl_z);
 	return -1;
 }
