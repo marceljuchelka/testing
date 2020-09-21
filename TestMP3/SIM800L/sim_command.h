@@ -11,6 +11,7 @@
 
 //AT prikazy
 //informacni
+#define GSM_reset			"AT+ATZ0"		//reset modulu
 #define GSM_reg_net			"AT+CREG?"		//je modul pripojen k siti?
 #define GSM_signal			"AT+CSQ"		//sila signalu
 #define GSM_init			"AT"			//komunikace s modulem
@@ -47,7 +48,7 @@
 #define 		pars_tel_sms	"\",\""	//sms telefon
 #define 		pars_tel_init	"\r\n"	//telefon s init
 
-#define 		ctrl_z			0x1A	//ukoncovaci znak na konci sms
+#define 		ctrl_z			26		//ukoncovaci znak na konci sms
 
 //bezpecnostni stringy
 #define 		SMS_init		"init "	//co se musi napsat do inicializacni sms je treba ulozit

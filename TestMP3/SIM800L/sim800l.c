@@ -26,12 +26,16 @@ const PROGMEM char head_from_sim[][15]={
 		{"NO CARRIER"},{"+DTMF:"},{"+CMGR:"},{"+CLIP:"},{"+CMTI:"},{"RING"}
 };
 
-EEMEM	char tel_number_init[15] = {"+420608111111"};
+EEMEM	char tel_number_init[15] = {"+420608100114"};
 
 
 
 
 int8_t sim800l_init(){
+//	while(sim800l_at_com_send(GSM_reset,1)== -1){
+//		_delay_ms(100);											//reset
+//	}
+
 	while(sim800l_at_com_send(GSM_init,1)== -1);				//inicializace
 
 	while (sim800l_at_com_send(GSM_text_mode,1) == -1){								//prepnuti na textove SMS
@@ -195,9 +199,11 @@ int8_t sim800l_dtmf_command(uint8_t dtmf_val){					//vykonani dtmf prikazu
 		MP3_queue_FIFO_play(sampl_info_sms_on_off,folder_info);
 //		sim800l_sms_send("+420608100114","text\26\0");
 	}
-//	if(dtmf_val == 4){
-//		sim800l_sms_send(tel_number_init,"abc");
-//	}
+	if(dtmf_val == 4){
+//		sim800l_at_com_send(GSM_ukonceni_hovoru,0);
+//		_delay_ms(200);
+		sim800l_sms_send(tel_number_init,"ahoj");
+	}
 	return -1;
 }
 
@@ -266,7 +272,7 @@ int8_t sim800l_at_com_send(char *command, uint8_t ansver){
 	strcpy(buf,command);
 //	lcd_str_al(0,0,buf+3,_left);
 	strcat(buf,"\r\n\0");
-	lcd_str_al(1,0,buf,_left);
+//	lcd_str_al(1,0,buf,_left);
 //	_delay_ms(1000);
 	PORTC|= DIR_conv;
 	_delay_ms(1);
@@ -290,18 +296,31 @@ return 0;
 
 int8_t sim800l_sms_send(char* tel_num, char *text){
 	char buf[27];
+//	uint16_t uart_znak;
+
 	strcpy(buf,GSM_send_sms_num);							//do buf at prikaz
 	eeprom_read_block(buf+9,tel_number_init+1,13);			//dale prida tel cislo bez +
-	buf[21]='\"';								// ukonci uvozovkami
+	buf[21]='\"';											// ukonci uvozovkami
+	buf[22]='\0';
+	while(sim800l_at_com_send(buf,1) == -1){				//prikaz posli na telefon +420.....
+	}
+	while (uart_getc() != '>');
 
-	sim800l_at_com_send(buf,0);
-	lcd_str_al(0,0,buf,_left);
-	lcd_str_al(1,0,buf+16,_left);
-	_delay_ms(200);
+
+	lcd_cls();
+	lcd_str_al(1,0,">>>",_left);
+//	lcd_str_al(1,0,buf+16,_left);
+
+	_delay_ms(100);
 	uart_puts(text);
+	lcd_str(text);
 
-	_delay_ms(1000);
-	lcd_str_al(0,0,text,_left);
+	_delay_ms(100);
+//	lcd_str_al(0,0,text,_left);
 	uart_putc(ctrl_z);
+	lcd_str("c+z");
+
+
+
 	return -1;
 }

@@ -47,6 +47,8 @@ int main(void){
 	lcd_str_al_P(0,0,build_info,_left);
 	lcd_str_al_P(0,15,build_time,_right);
 	lcd_str_al_P(1,15,build_date,_right);
+
+	sim800l_at_com_send(GSM_reset,0);
 	_delay_ms(2000);
 	sim800l_check();
 
