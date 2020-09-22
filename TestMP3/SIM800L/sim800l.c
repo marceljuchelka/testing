@@ -200,8 +200,8 @@ int8_t sim800l_dtmf_command(uint8_t dtmf_val){					//vykonani dtmf prikazu
 //		sim800l_sms_send("+420608100114","text\26\0");
 	}
 	if(dtmf_val == 4){
-//		sim800l_at_com_send(GSM_ukonceni_hovoru,0);
-//		_delay_ms(200);
+		sim800l_at_com_send(GSM_ukonceni_hovoru,0);
+		_delay_ms(200);
 		sim800l_sms_send(tel_number_init,"ahoj");
 	}
 	return -1;
@@ -305,19 +305,18 @@ int8_t sim800l_sms_send(char* tel_num, char *text){
 	while(sim800l_at_com_send(buf,1) == -1){				//prikaz posli na telefon +420.....
 	}
 	while (uart_getc() != '>');
-
+	_delay_ms(100);
 
 	lcd_cls();
-	lcd_str_al(1,0,">>>",_left);
+	lcd_str_al(0,0,">",_left);
 //	lcd_str_al(1,0,buf+16,_left);
-
-	_delay_ms(100);
+	PORTC|= DIR_conv;
+	_delay_ms(1);
 	uart_puts(text);
-	lcd_str(text);
-
-	_delay_ms(100);
-//	lcd_str_al(0,0,text,_left);
 	uart_putc(ctrl_z);
+//	uart_puts("\r\n");
+	_delay_ms(1);
+	PORTC&= ~DIR_conv;
 	lcd_str("c+z");
 
 
