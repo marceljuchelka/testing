@@ -199,11 +199,11 @@ int8_t sim800l_dtmf_command(uint8_t dtmf_val){					//vykonani dtmf prikazu
 		MP3_queue_FIFO_play(sampl_info_sms_on_off,folder_info);
 //		sim800l_sms_send("+420608100114","text\26\0");
 	}
-	if(dtmf_val == 4){
-		sim800l_at_com_send(GSM_ukonceni_hovoru,0);
-		_delay_ms(200);
-		sim800l_sms_send(tel_number_init,"ahoj");
-	}
+//	if(dtmf_val == 4){
+//		sim800l_at_com_send(GSM_ukonceni_hovoru,0);
+//		_delay_ms(500);
+//		sim800l_sms_send(tel_number_init,"ahoj");
+//	}
 	return -1;
 }
 
@@ -230,6 +230,7 @@ int8_t sim800l_sms(char *rx_string){					//inicializacni SMS musi byt ve tvaru "
 			sim800l_tel_num_write(tel_num_sms);
 			lcd_str_al(1,15,"in",_right);
 			lcd_str_al(1,0,tel_num_sms,_left);
+			sim800l_sms_send(tel_number_init,"Registrace OK");		//odeslani SMS o registraci
 		}
 	}
 	sim800l_at_com_send(GSM_sms_del_all,1);
@@ -299,25 +300,28 @@ int8_t sim800l_sms_send(char* tel_num, char *text){
 //	uint16_t uart_znak;
 
 	strcpy(buf,GSM_send_sms_num);							//do buf at prikaz
-	eeprom_read_block(buf+9,tel_number_init+1,13);			//dale prida tel cislo bez +
-	buf[21]='\"';											// ukonci uvozovkami
-	buf[22]='\0';
-	while(sim800l_at_com_send(buf,1) == -1){				//prikaz posli na telefon +420.....
-	}
+	eeprom_read_block(buf+9,tel_number_init,13);			//dale prida tel cislo bez +
+//	strcpy(buf+9,tel_num);
+	buf[22]='\"';											// ukonci uvozovkami
+	buf[23]='\0';
+//	while(sim800l_at_com_send(buf,1) == -1){				//prikaz posli na telefon +420.....
+//	}
+	sim800l_at_com_send(buf,0);
+	_delay_ms(100);
 	while (uart_getc() != '>');
 	_delay_ms(100);
 
 	lcd_cls();
-	lcd_str_al(0,0,">",_left);
-//	lcd_str_al(1,0,buf+16,_left);
+	lcd_str_al(1,0,"sms send",_left);
+	_delay_ms(1000);
 	PORTC|= DIR_conv;
 	_delay_ms(1);
 	uart_puts(text);
 	uart_putc(ctrl_z);
-//	uart_puts("\r\n");
 	_delay_ms(1);
 	PORTC&= ~DIR_conv;
-	lcd_str("c+z");
+	sim800l_at_com_send("\r\n\0",0);
+
 
 
 

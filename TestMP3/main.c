@@ -67,6 +67,7 @@ int main(void){
 			if (proces==3)proces = 0;
 			sekundy = 60;
 		}
+//		sim800l_sms_send("+420608100114", "pokus");
 	}
 }
 
