@@ -26,7 +26,7 @@ const PROGMEM char head_from_sim[][15]={
 		{"NO CARRIER"},{"+DTMF:"},{"+CMGR:"},{"+CLIP:"},{"+CMTI:"},{"RING"}
 };
 
-EEMEM	char tel_number_init[15] = {"+420608100114"};
+EEMEM	char tel_number_init[15] = {"+4206081111111"};
 
 
 
@@ -54,6 +54,9 @@ int8_t sim800l_init(){
 	_delay_ms(100);
 	}
 	while (sim800l_at_com_send(GSM_micr_gain,1) == -1){
+		_delay_ms(100);
+	}
+	while(sim800l_at_com_send(GSM_sms_del_all,1) == -1){
 		_delay_ms(100);
 	}
 	while(!(uart_getc()& 0xFF00));
@@ -213,8 +216,8 @@ int8_t sim800l_sms_info(char *rx_string){
 }
 
 int8_t sim800l_sms(char *rx_string){					//inicializacni SMS musi byt ve tvaru "init +420608100114 init" (bez uvozovek)
-	char 	tel_num_sms[15]; // = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
-	for(uint8_t i=0;i<15; i++) tel_num_sms[i]=0;
+	char 	tel_num_sms[15]= "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+//	for(uint8_t i=0;i<15; i++) tel_num_sms[i]=0;
 	char *ptr_init;
 	ptr_init = (strstr(rx_string,pars_tel_sms));					//najde parsovaci retezec
 	strncpy(tel_num_sms,(ptr_init+3),13);						//zkopiruje sms telefon do telnumsms
@@ -230,7 +233,9 @@ int8_t sim800l_sms(char *rx_string){					//inicializacni SMS musi byt ve tvaru "
 			sim800l_tel_num_write(tel_num_sms);
 			lcd_str_al(1,15,"in",_right);
 			lcd_str_al(1,0,tel_num_sms,_left);
-			sim800l_sms_send(tel_number_init,"Registrace OK");		//odeslani SMS o registraci
+			sim800l_at_com_send(GSM_sms_del_all,1);
+			_delay_ms(100);
+			sim800l_sms_send(tel_num_sms,"Registrace OK");		//odeslani SMS o registraci
 		}
 	}
 	sim800l_at_com_send(GSM_sms_del_all,1);
@@ -300,8 +305,8 @@ int8_t sim800l_sms_send(char* tel_num, char *text){
 //	uint16_t uart_znak;
 
 	strcpy(buf,GSM_send_sms_num);							//do buf at prikaz
-	eeprom_read_block(buf+9,tel_number_init,13);			//dale prida tel cislo bez +
-//	strcpy(buf+9,tel_num);
+//	eeprom_read_block(buf+9,tel_number_init,13);			//dale prida tel cislo bez +
+	strcpy(buf+9,tel_num);
 	buf[22]='\"';											// ukonci uvozovkami
 	buf[23]='\0';
 //	while(sim800l_at_com_send(buf,1) == -1){				//prikaz posli na telefon +420.....
@@ -310,10 +315,6 @@ int8_t sim800l_sms_send(char* tel_num, char *text){
 	_delay_ms(100);
 	while (uart_getc() != '>');
 	_delay_ms(100);
-
-	lcd_cls();
-	lcd_str_al(1,0,"sms send",_left);
-	_delay_ms(1000);
 	PORTC|= DIR_conv;
 	_delay_ms(1);
 	uart_puts(text);
@@ -321,7 +322,8 @@ int8_t sim800l_sms_send(char* tel_num, char *text){
 	_delay_ms(1);
 	PORTC&= ~DIR_conv;
 	sim800l_at_com_send("\r\n\0",0);
-
+	lcd_str_al(1,15,"sms",_right);
+	_delay_ms(100);
 
 
 
