@@ -23,6 +23,7 @@
 #include "SIM800L/sim_command.h"
 #include "UART/uart.h"
 #include "SIM800L/sim800l.h"
+#include "MJ_AM2320B/mj_am2320b.h"
 
 volatile uint8_t sekundy=1, proces=1;
 PROGMEM const char build_info[] = "Build:";
@@ -67,7 +68,16 @@ int main(void){
 			if (proces==3)proces = 0;
 			sekundy = 60;
 		}
-//		sim800l_sms_send("+420608100114", "pokus");
+		int8_t teplota = am2320_getdata(temperat);
+
+		lcd_str_al(1,13,"  ",_left);
+		lcd_int_al(1,15,teplota,_right);
+
+
+		int8_t vlhkost = am2320_getdata(humidy);
+		lcd_str_al(1,8,"  ",_left);
+		lcd_int_al(1,10,vlhkost,_right);
+
 	}
 }
 
