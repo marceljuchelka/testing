@@ -68,10 +68,9 @@ int main(void){
 			if (proces==3)proces = 0;
 			sekundy = 60;
 		}
-//		if(sekundy %10 == 0){
-//		sim800l_net_registrace();
-//		sim800l_signal_qality();
-//		}
+//		sim800l_signal_ikon(signal[3],0,0);
+
+
 //		int8_t teplota = am2320_getdata(temperat);
 //
 //		lcd_str_al(1,15,"   ",_right);

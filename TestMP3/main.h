@@ -11,7 +11,7 @@
 
 void lcdprint_buffer();
 void MP3_test();
-
+extern volatile uint8_t sekundy, proces;
 
 
 #endif /* MAIN_H_ */

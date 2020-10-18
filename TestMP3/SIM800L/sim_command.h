@@ -11,7 +11,7 @@
 
 //AT prikazy
 //informacni
-#define GSM_reset			"AT+ATZ0"		//reset modulu
+#define GSM_reset			"AT+ATZ"		//reset modulu
 #define GSM_reg_net			"AT+CREG?"		//je modul pripojen k siti?
 #define GSM_signal			"AT+CSQ"		//sila signalu
 #define GSM_init			"AT"			//komunikace s modulem

@@ -78,6 +78,7 @@ int MP3_send_buffer(TCOMMAND *command){
 //	char hex[3];
 	checksum(command);
 	PORTC|= DIR_conv;
+	_delay_us(100);
 	for (uint8_t i = 0; i<10; i++){
 //		itoa(command->bytes[i],hex,16);
 //		uart_puts(hex);
@@ -85,6 +86,7 @@ int MP3_send_buffer(TCOMMAND *command){
 //		uart_putc(command->bytes[i]);
 		suart_putc(command->bytes[i]);
 	}
+	_delay_us(100);
 	PORTC&=~DIR_conv;
 //	uart_puts("\r\n");
 	return 1;

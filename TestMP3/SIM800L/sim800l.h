@@ -26,9 +26,18 @@ int8_t sim800l_check();
 int8_t sim800l_net_registrace();
 int8_t sim800l_signal_qality();
 int8_t sim800l_read_uart_answer(char *buf,uint8_t len);
+void sim800l_signal_ikon(const uint8_t *znak, uint8_t y,uint8_t x);
 
 #define DIR_conv (1<<PC1);		//pin dir na prevodnik5 vs 3.3V
+extern PROGMEM const uint8_t signal[][8];
+extern volatile char stav_sim800l;
+//stavy na modulu
+#define volani 1
 
+
+//makra
+
+#define stav_volani (1<<volani)
 
 
 
