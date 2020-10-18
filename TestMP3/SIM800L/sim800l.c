@@ -135,7 +135,7 @@ int8_t sim800l_check(){
 int8_t sim800l_read(){							//navrat commandu
 	int8_t len, hlavicka;
 	char rx_buf[255];
-	if((sekundy %10 == 0) && (!(stav_sim800l& stav_volani))){
+	if((sekundy %50 == 0) && (!(stav_sim800l& stav_volani))){
 //		sim800l_net_registrace();
 		sim800l_signal_qality();
 	}
@@ -146,7 +146,6 @@ int8_t sim800l_read(){							//navrat commandu
 		lcd_str_al(0,15,"UL",_right);
 		hlavicka = sim800l_msg_head(rx_buf);		//zjisti podle hlavicky o jakou informaci jde
 		sim800l_select_command(rx_buf,hlavicka);
-		stav_sim800l&= ~stav_volani;
 		//		sim800l_select_command(rx_buf);
 //		parse_string(rx_buf);
 //		while(!(uart_getc()& 0xFF00));
@@ -178,7 +177,7 @@ int8_t sim800l_select_command(char *rx_string,uint8_t hlavicka){
 	if(hlavicka == H_NO_C)	{
 		lcd_cls();
 		lcd_str_al(0,0,"pol",_left);
-//		stav_sim800l &= ~stav_volani;
+		stav_sim800l &= ~stav_volani;
 		MP3_queue_FIFO_play(0,255);
 		return 1;
 	}
@@ -292,12 +291,17 @@ int8_t sim800l_sms(char *rx_string){					//inicializacni SMS musi byt ve tvaru "
 			sim800l_tel_num_write(tel_num_sms);
 			lcd_str_al(1,15,"in",_right);
 			lcd_str_al(1,0,tel_num_sms,_left);
-			sim800l_at_com_send(GSM_sms_del_all,1);
+			sim800l_at_com_send(GSM_sms_del_all,0);
 			_delay_ms(100);
 			sim800l_sms_send(tel_num_sms,"Registrace OK");		//odeslani SMS o registraci
+			stav_sim800l &= ~stav_volani;
+			lcd_str_al_P(1,0,LCDTEXT_PRAZDNY,_left);
+			return 1;
 		}
 	}
-	sim800l_at_com_send(GSM_sms_del_all,1);
+
+	sim800l_at_com_send(GSM_sms_del_all,0);
+	stav_sim800l &= ~stav_volani;
 	return -1;
 }
 
@@ -428,7 +432,7 @@ int8_t sim800l_signal_qality(){
 			if(hodnota_signalu_int <= pgm_read_byte(&tab_sila_signalu[i++])) break;
 		}
 	lcd_defchar_P(5,signal[i]);
-	lcd_locate(1,10);
+	lcd_locate(0,13);
 	lcd_char(5);
 	return 1;
 	}
