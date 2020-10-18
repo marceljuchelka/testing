@@ -23,8 +23,13 @@ int8_t sim800l_at_com_send(char *command, uint8_t ansver);
 int8_t sim800l_dtmf_command(uint8_t dtmf_val);
 int8_t sim800l_sms_send(char* tel_num, char *text);
 int8_t sim800l_check();
+int8_t sim800l_net_registrace();
+int8_t sim800l_signal_qality();
+int8_t sim800l_read_uart_answer(char *buf,uint8_t len);
 
 #define DIR_conv (1<<PC1);		//pin dir na prevodnik5 vs 3.3V
+
+
 
 
 

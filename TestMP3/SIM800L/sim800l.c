@@ -22,43 +22,60 @@
 
 extern volatile uint8_t sekundy, proces;
 
-const PROGMEM char head_from_sim[][15]={
+PROGMEM const char head_from_sim[][15]={
 		{"NO CARRIER"},{"+DTMF:"},{"+CMGR:"},{"+CLIP:"},{"+CMTI:"},{"RING"}
 };
-
+//napisy na LCD
+PROGMEM const char	LCDTEXT_PRAZDNY[] = "                ";
+//telefon v eeprom
 EEMEM	char tel_number_init[15] = {"+4206081111111"};
 
 
 
 
 int8_t sim800l_init(){
+	DDRC|= DIR_conv;
 //	while(sim800l_at_com_send(GSM_reset,1)== -1){
 //		_delay_ms(100);											//reset
 //	}
+	while (sim800l_at_com_send(GSM_echo_off,1) == -1){
+		_delay_ms(100);
+	}
+	lcd_str_al(0,0,GSM_echo_off,_left);
+	_delay_ms(1000);
 
 	while(sim800l_at_com_send(GSM_init,1)== -1);				//inicializace
+	lcd_str_al(0,0,GSM_reset,_left);
+	_delay_ms(1000);
 
 	while (sim800l_at_com_send(GSM_text_mode,1) == -1){								//prepnuti na textove SMS
-	_delay_ms(100);
+		_delay_ms(100);
 	}
+	lcd_str_al(0,0,GSM_text_mode,_left);
+	_delay_ms(1000);
 	while (sim800l_at_com_send(GSM_DTMF_on,1) == -1){									//zapni prijem DTMF
-	_delay_ms(100);
+		_delay_ms(100);
 	}
+	lcd_str_al(0,0,GSM_DTMF_on,_left);
+	_delay_ms(1000);
 	while (sim800l_at_com_send(GSM_sms_del_all,1) == -1){								//smazat vsechny sms
-	_delay_ms(100);
+		_delay_ms(100);
 	}
+	lcd_str_al(0,0,GSM_sms_del_all,_left);
+	_delay_ms(1000);
 	while (sim800l_at_com_send(GSM_signal,1) == -1){									//signal gsm?
-	_delay_ms(100);
+		_delay_ms(100);
 	}
-	while (sim800l_at_com_send(GSM_echo_off,1) == -1){
-	_delay_ms(100);
-	}
+	lcd_str_al(0,0,GSM_signal,_left);
+	_delay_ms(1000);
+
+	_delay_ms(1000);
 	while (sim800l_at_com_send(GSM_micr_gain,1) == -1){
 		_delay_ms(100);
 	}
-	while(sim800l_at_com_send(GSM_sms_del_all,1) == -1){
-		_delay_ms(100);
-	}
+	lcd_str_al(0,0,GSM_micr_gain,_left);
+	_delay_ms(1000);
+
 	while(!(uart_getc()& 0xFF00));
 	return 0;
 }
@@ -66,14 +83,12 @@ int8_t sim800l_init(){
 int8_t sim800l_check(){
 	DDRB&= ~(1<<PB2);
 	if(!(PINB& (1<<PB2))){
-		lcd_cls();
-		lcd_str_al(0,0,"modul pripojen",_left);
-		_delay_ms(2000);
-		lcd_str_al(0,6,"kontrola",_left);
+		_delay_ms(1000);
 		while(1) {
-			_delay_ms(5000);
+//			_delay_ms(5000);
 			if(sim800l_init() == 0){
 				lcd_str_al(1,5,"modul OK",_left);
+				_delay_ms(1000);
 				lcd_cls();
 				return 1;
 			}
@@ -87,11 +102,12 @@ int8_t sim800l_check(){
 }
 
 int8_t sim800l_read(){							//navrat commandu
-	lcd_str_al(0,15,"  ",_right);
 	int8_t len, hlavicka;
-	char rx_buf[129];
-	len = sim800l_read_uart(rx_buf);				//nacte data z UARTu
+	char rx_buf[255];
+//	len = sim800l_read_uart(rx_buf);				//nacte data z UARTu
+	len = sim800l_read_uart_answer(rx_buf,255);
 	if(len!=-1){									//neni li nic tak skoci nazpet
+		lcd_str_al(0,15,"UL",_right);
 		hlavicka = sim800l_msg_head(rx_buf);		//zjisti podle hlavicky o jakou informaci jde
 		sim800l_select_command(rx_buf,hlavicka);
 		//		sim800l_select_command(rx_buf);
@@ -99,7 +115,7 @@ int8_t sim800l_read(){							//navrat commandu
 //		while(!(uart_getc()& 0xFF00));
 	}
 	else {
-		lcd_str_al(0,15,"RK",_right);
+		lcd_str_al(0,15,"UC",_right);
 		return -1;
 	}
 
@@ -107,7 +123,7 @@ return 0;
 }
 
 int8_t sim800l_msg_head(char *message){						//zjisteni hlavicky dat z SIM800l
-	char select_string[20];
+	char select_string[100];
 	strncpy(select_string,message,19);
 	char *head;
 	uint8_t pozice = 0;
@@ -123,7 +139,9 @@ int8_t sim800l_msg_head(char *message){						//zjisteni hlavicky dat z SIM800l
 
 int8_t sim800l_select_command(char *rx_string,uint8_t hlavicka){
 	if(hlavicka == H_NO_C)	{
+		lcd_cls();
 		lcd_str_al(0,0,"pol",_left);
+
 		MP3_queue_FIFO_play(0,255);
 		return 1;
 	}
@@ -166,6 +184,7 @@ int8_t sim800l_ringign(char *rx_string){
 		MP3_queue_FIFO_play(menu_proces_minut,folder_menu);
 		MP3_queue_FIFO_play(menu_SMS_info_on,folder_menu);
 		MP3_queue_FIFO_play(sampl_vyberte_dotaz,folder_info);
+//		lcd_str_al_P(1,0,LCDTEXT_PRAZDNY,_left);
 	//	while ((sim800l_read_uart(rx_string))> -1);							//aby vyprazdnil uart
 		return 1;
 	}
@@ -211,7 +230,9 @@ int8_t sim800l_dtmf_command(uint8_t dtmf_val){					//vykonani dtmf prikazu
 }
 
 int8_t sim800l_sms_info(char *rx_string){
+	_delay_ms(50);
 	sim800l_at_com_send(GSM_sms_read1,0);				//posli mi SMS      AT+CMGR=1
+	_delay_ms(50);
 	return 1;
 }
 
@@ -256,9 +277,10 @@ int8_t sim800l_read_uart(char *buf){		//precte buff uartu. je li konec tak posle
 //		uart_putc(*(buf+pozice));								//echo
 		if((*(buf+pozice) == '\n' && *(buf+pozice-1) == '\r')){		//||*(buf+pozice) == 0 *(buf+pozice-1) == 0x0d) &&
 			*(buf+pozice+1) = '\0';
+			lcd_str_al(1,0,buf,_left);
 			return pozice;
 		}
-//		lcd_int_al(1,15,pozice,_right);
+		lcd_int_al(1,15,pozice,_right);
 		if(*(buf+pozice)>0)	pozice++;
 
 	}
@@ -273,7 +295,7 @@ void sim800l_tel_num_write(char *telnum){
 }
 
 int8_t sim800l_at_com_send(char *command, uint8_t ansver){
-	char buf[27];
+	char buf[100];
 //	int8_t len = 0;
 	strcpy(buf,command);
 //	lcd_str_al(0,0,buf+3,_left);
@@ -281,18 +303,18 @@ int8_t sim800l_at_com_send(char *command, uint8_t ansver){
 //	lcd_str_al(1,0,buf,_left);
 //	_delay_ms(1000);
 	PORTC|= DIR_conv;
-	_delay_ms(1);
+	_delay_us(20);
 	uart_puts(buf);
 	while(1){
 		if (!(UCSR0B& (1<<UDRIE0))) break;
 	}
-	_delay_ms(1);
+	_delay_us(20);
 	PORTC&= ~DIR_conv;
 	if(ansver == 1){
-//		_delay_ms(100);
+		_delay_ms(100);										//cas na odpoved z modulu
 //		while (sim800l_read_uart(buf) == -1);
-		if(sim800l_read_uart(buf) == -1) return -1;
-//		sim800l_read_uart(buf);
+//		if(sim800l_read_uart(buf) == -1) return -1;
+		sim800l_read_uart_answer(buf,sizeof(buf));
 		if (strstr(buf,"OK")) return 1;
 		if (strstr(buf,"ERROR")) return -1;
 	}
@@ -324,8 +346,47 @@ int8_t sim800l_sms_send(char* tel_num, char *text){
 	sim800l_at_com_send("\r\n\0",0);
 	lcd_str_al(1,15,"sms",_right);
 	_delay_ms(100);
-
-
-
 	return -1;
+}
+
+int8_t sim800l_net_registrace(){
+	char buf[25];
+	sim800l_at_com_send(GSM_reg_net,0);
+	_delay_ms(100);
+	while(sim800l_read_uart(buf)>0){
+		if(strstr(buf,"0,1")){
+			lcd_str_al(1,0,"OK",_left);
+		}
+		if(strstr(buf,"OK")) {
+			lcd_str_al(1,0,buf,_left);
+			return 1;
+		}
+	}
+//	while ((sim800l_read_uart(flush))> -1);
+	return -1;
+}
+
+int8_t sim800l_signal_qality(){
+	char buf[25];
+//	uint8_t ukazatel;
+	sim800l_at_com_send(GSM_signal,0);
+	_delay_ms(50);
+	sim800l_read_uart_answer(buf,25);
+		if(strstr(buf,"+CSQ")) 	lcd_str_al(1,0,buf,_left);
+		if(strstr(buf,"OK")) return 1;
+		return 0;
+}
+
+int8_t sim800l_read_uart_answer(char *buf,uint8_t len){
+	uint8_t i=0;
+	while(len--){
+		buf[i] = (char) uart_getc();
+		buf[i+1] = 0;
+		if(strstr(buf,"\r\nOK\r\n")) {
+			lcd_str_al(1,0,buf,_left);
+			return i;
+		}
+		i++;
+	}
+return -1;
 }

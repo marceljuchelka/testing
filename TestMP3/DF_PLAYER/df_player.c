@@ -93,6 +93,9 @@ int MP3_send_buffer(TCOMMAND *command){
 
 //inicializace MP3 modulu
 void MP3_init(){
+	DDRC|= DIR_conv;
+	PORTC&= ~DIR_conv;
+	_delay_ms(1);
 	MP3_command(device_source,device_init);
 	_delay_ms(200);
 	MP3_command(volume_level,volume_init);
