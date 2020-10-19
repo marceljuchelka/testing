@@ -71,15 +71,15 @@ int main(void){
 //		sim800l_signal_ikon(signal[3],0,0);
 
 
-//		int8_t teplota = am2320_getdata(temperat);
-//
-//		lcd_str_al(1,15,"   ",_right);
-//		lcd_int_al(1,15,teplota,_right);
-//
-//
-//		int8_t vlhkost = am2320_getdata(humidy);
-//		lcd_str_al(1,12,"  ",_right);
-//		lcd_int_al(1,12,vlhkost,_right);
+		int8_t teplota = am2320_getdata(temperat);
+
+		lcd_str_al(1,15,"   ",_right);
+		lcd_int_al(1,15,teplota,_right);
+
+
+		int8_t vlhkost = am2320_getdata(humidy);
+		lcd_str_al(1,12,"  ",_right);
+		lcd_int_al(1,12,vlhkost,_right);
 
 	}
 }
