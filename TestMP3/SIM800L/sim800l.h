@@ -26,18 +26,23 @@ int8_t sim800l_check();
 int8_t sim800l_net_registrace();
 int8_t sim800l_signal_qality();
 int8_t sim800l_read_uart_answer(char *buf,uint8_t len);
-void sim800l_signal_ikon(const uint8_t *znak, uint8_t y,uint8_t x);
+void sim800l_signal_value_icon();
 
 #define DIR_conv (1<<PC1);		//pin dir na prevodnik5 vs 3.3V
+#define NECINNOST_DEF	20
+
+//promenne
 extern PROGMEM const uint8_t signal[][8];
 extern volatile char stav_sim800l;
-//stavy na modulu
-#define volani 1
+extern volatile uint8_t signal_value, necinnost;
 
+//stavy na modulu
+#define A_volani 	1
+#define A_SMS		2
 
 //makra
-
-#define stav_volani (1<<volani)
+#define stav_volani (1<<A_volani)
+#define stav_SMS	(1<<A_SMS)
 
 
 

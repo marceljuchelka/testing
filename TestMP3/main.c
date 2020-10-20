@@ -29,6 +29,7 @@ volatile uint8_t sekundy=1, proces=1;
 PROGMEM const char build_info[] = "Build:";
 PROGMEM const char build_date[] = __DATE__;
 PROGMEM const char build_time[] = __TIME__;
+volatile uint8_t pocitadlo_sekundy;
 
 
 int main(void){
@@ -68,7 +69,8 @@ int main(void){
 			if (proces==3)proces = 0;
 			sekundy = 60;
 		}
-//		sim800l_signal_ikon(signal[3],0,0);
+		sim800l_signal_value_icon();
+//		lcd_int_al(0,0,necinnost,_left);
 
 
 		int8_t teplota = am2320_getdata(temperat);

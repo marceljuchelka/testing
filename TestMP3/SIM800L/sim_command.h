@@ -35,11 +35,11 @@
 //hlavicky z SIM800L
 
 #define 		H_NO_C		 	0		//ukonceni hovoru
-#define 		H_DTMF			1
-#define 		H_CMGR			2
-#define 		H_CLIP			3		//info o volani
+#define 		H_DTMF			1		//DTMF prikaz
+#define 		H_CMGR			2		//SMS s telefonem a daty
+#define 		H_CLIP			3		//volani s cislem telefonu
 #define 		H_CMTI			4		//info o prichozi SMS
-#define 		H_RING			5
+#define 		H_RING			5		//info o volani
 
 //parsovaci oddelovace
 #define 		pars_telnum		"\""	//	",\""	//zjisteni telef. cisla

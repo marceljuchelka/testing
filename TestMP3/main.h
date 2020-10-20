@@ -12,6 +12,7 @@
 void lcdprint_buffer();
 void MP3_test();
 extern volatile uint8_t sekundy, proces;
+extern volatile uint8_t pocitadlo_sekundy;
 
 
 #endif /* MAIN_H_ */
