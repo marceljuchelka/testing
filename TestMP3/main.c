@@ -53,6 +53,7 @@ int main(void){
 	sim800l_at_com_send(GSM_reset,0);
 	_delay_ms(2000);
 	sim800l_check();
+//	keypad_init();
 
 
 	while(1){
@@ -64,6 +65,7 @@ int main(void){
 		MP3_queue_FIFO_play(0,0);
 
 		_delay_ms(1000);
+
 		if(sekundy == 0) {
 			proces++;
 			if (proces==3)proces = 0;
