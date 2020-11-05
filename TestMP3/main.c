@@ -53,7 +53,9 @@ int main(void){
 	sim800l_at_com_send(GSM_reset,0);
 	_delay_ms(2000);
 	sim800l_check();
-//	keypad_init();
+//	while(1) {
+//		keypad_init();
+//	}
 
 
 	while(1){
