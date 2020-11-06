@@ -24,19 +24,20 @@
 	 0| 1| 0| 0| 1| 1| 1|  |0x4E
 */
 
+
+
 #ifndef KEYPAD_H_
 #define KEYPAD_H_
 #include "../main.h"
 
 void keypad_init();
+int8_t vypocet_tlacitka(uint8_t radek,uint8_t sloupec);
+int8_t key_read();
+int8_t key_read_str(char *ptr);
 
-#define Key_PCF8574_addr 0x40
+#define Key_PCF8574_addr 0x42	//adresa expanderu klavesnice
 
-#define C1	0b00000001
-//#define C2	0b01000000
-//#define C3	0b00100000
-//#define C4	0b00010000
-
+#define L1	0b00010000			//bit radku klavesnice
 
 
 #endif /* KEYPAD_H_ */

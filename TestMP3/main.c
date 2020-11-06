@@ -30,6 +30,7 @@ PROGMEM const char build_info[] = "Build:";
 PROGMEM const char build_date[] = __DATE__;
 PROGMEM const char build_time[] = __TIME__;
 volatile uint8_t pocitadlo_sekundy;
+volatile uint16_t milisekundy = 100;
 
 
 int main(void){
@@ -53,10 +54,6 @@ int main(void){
 	sim800l_at_com_send(GSM_reset,0);
 	_delay_ms(2000);
 	sim800l_check();
-//	while(1) {
-//		keypad_init();
-//	}
-
 
 	while(1){
 		sekundy--;
@@ -65,13 +62,19 @@ int main(void){
 		lcd_int_al(0,9,proces,_right);
 		sim800l_read();
 		MP3_queue_FIFO_play(0,0);
-
-		_delay_ms(1000);
+		while(milisekundy--){
+			int8_t tlacitko = key_read();
+			if(tlacitko >=0)	lcd_int_al(0,0,tlacitko,_left);
+			_delay_ms(10);
+		}
+		milisekundy = 80;
+		lcd_str_al(0,0,"   ",_left);
 
 		if(sekundy == 0) {
 			proces++;
 			if (proces==3)proces = 0;
 			sekundy = 60;
+
 		}
 		sim800l_signal_value_icon();
 //		lcd_int_al(0,0,necinnost,_left);
