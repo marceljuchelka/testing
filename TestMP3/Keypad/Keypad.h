@@ -34,6 +34,7 @@ void keypad_init();
 int8_t vypocet_tlacitka(uint8_t radek,uint8_t sloupec);
 int8_t key_read();
 int8_t key_read_str(char *ptr);
+int8_t key_sn_enter();
 
 #define Key_PCF8574_addr 0x42	//adresa expanderu klavesnice
 

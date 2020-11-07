@@ -31,6 +31,7 @@ PROGMEM const char build_date[] = __DATE__;
 PROGMEM const char build_time[] = __TIME__;
 volatile uint8_t pocitadlo_sekundy;
 volatile uint16_t milisekundy = 100;
+char sernum_buffer[15];
 
 
 int main(void){
@@ -65,6 +66,9 @@ int main(void){
 		while(milisekundy--){
 			int8_t tlacitko = key_read();
 			if(tlacitko >=0)	lcd_int_al(0,0,tlacitko,_left);
+			if(tlacitko == 10) {
+				(key_sn_enter());
+			}
 			_delay_ms(10);
 		}
 		milisekundy = 80;

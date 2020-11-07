@@ -62,12 +62,49 @@ int8_t vypocet_tlacitka(uint8_t radek,uint8_t sloupec){
 }
 
 int8_t key_read_str(char *ptr){ 						//nacti cislo 13 znaku do stringu a uloz * = 13
-	char buf[14];
-	int8_t vysledek;
+	int8_t vysledek,pozice = 0;
+	while(key_read()>=0);
+	lcd_cls();
+	lcd_str_al(0,0,"zadej SN:",_left);
+	lcd_locate(1,0);
 	while(1){
 		vysledek = key_read();
-		if(vysledek == 13) return 1;
+		if(vysledek == 14 || pozice >10) {
+			lcd_cls();
+			return 1;
+		}
+		if(vysledek >=0 && vysledek<10){
+			while(key_read()>=0);
+			*(ptr+pozice++) = vysledek+48;
+			*(ptr+pozice) = '\0';
+			lcd_str_al(1,0,ptr,_left);
+		}
 	}
 return -1;
+}
+
+int8_t key_sn_enter(){
+	char buffer[15];
+	char *ptr = buffer;
+	int8_t vysledek,pozice = 0;
+	while(key_read()>=0);
+	lcd_cls();
+	lcd_str_al(0,0,"zadej SN:",_left);
+	lcd_locate(1,0);
+	while(1){
+		vysledek = key_read();
+		if(vysledek == 14 || pozice >10) {
+			lcd_cls();
+			return 1;
+		}
+		if(vysledek >=0 && vysledek<10){
+			while(key_read()>=0);
+			*(ptr+pozice++) = vysledek+48;
+			*(ptr+pozice) = '\0';
+			lcd_str_al(1,0,ptr,_left);
+		}
+	}
+return -1;
+
 }
 
