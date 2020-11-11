@@ -29,6 +29,8 @@
 
 void lcdprint_buffer();
 void MP3_test();
+uint8_t i2c_scan();
+int8_t i2c_test_address(uint8_t adresa);
 extern volatile uint8_t sekundy, proces;
 extern volatile uint8_t pocitadlo_sekundy;
 

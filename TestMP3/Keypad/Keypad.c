@@ -8,7 +8,6 @@
 
 #include <avr/io.h>
 #include "../main.h"
-#include "../main.h"
 #include "../Keypad/Keypad.h"
 
 //tlacitka na klavesnici
@@ -18,9 +17,13 @@ PROGMEM const uint8_t tlacitko[4][4] =
 			{7,8,9,12},
 			{13,0,14,15}
 		};
-
+uint8_t klav_OK;
 
 void keypad_init(){
+	if(key_test_address(1)){
+		klav_OK = 1;
+	}
+
 
 
 }
@@ -105,6 +108,14 @@ int8_t key_sn_enter(){
 		}
 	}
 return -1;
-
 }
 
+int8_t key_test_address(uint8_t adresa){
+	adresa = Key_PCF8574_addr;
+	i2c_start();
+	if(i2c_write(adresa)) {
+		i2c_stop();
+		return 1;
+	}
+	return 0;
+}

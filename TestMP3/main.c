@@ -24,6 +24,7 @@
 #include "UART/uart.h"
 #include "SIM800L/sim800l.h"
 #include "MJ_AM2320B/mj_am2320b.h"
+#include "ADS_1115/ads_1115.h"
 
 volatile uint8_t sekundy=1, proces=1;
 PROGMEM const char build_info[] = "Build:";
@@ -38,6 +39,7 @@ int main(void){
 
 //	DDRC = 0;
 //	PORTC = 0;
+//	uint8_t i=0xff;
 	DDRC|= DIR_conv;
 	PORTC&=~DIR_conv;
 	lcd_init();
@@ -51,6 +53,11 @@ int main(void){
 	lcd_str_al_P(0,0,build_info,_left);
 	lcd_str_al_P(0,15,build_time,_right);
 	lcd_str_al_P(1,15,build_date,_right);
+	keypad_init();
+//	ads_read_config_register();
+
+
+
 
 	sim800l_at_com_send(GSM_reset,0);
 	_delay_ms(2000);
@@ -64,15 +71,20 @@ int main(void){
 		sim800l_read();
 		MP3_queue_FIFO_play(0,0);
 		while(milisekundy--){
-			int8_t tlacitko = key_read();
-			if(tlacitko >=0)	lcd_int_al(0,0,tlacitko,_left);
-			if(tlacitko == 10) {
-				(key_sn_enter());
+			if(klav_OK){
+				int8_t tlacitko = key_read();
+				if(tlacitko >=0)	{
+					lcd_str_al(0,0,"   ",_left);
+					lcd_int_al(0,0,tlacitko,_left);
+				}
+				if(tlacitko == 10) {
+					(key_sn_enter());
+				}
 			}
 			_delay_ms(10);
 		}
 		milisekundy = 80;
-		lcd_str_al(0,0,"   ",_left);
+
 
 		if(sekundy == 0) {
 			proces++;
@@ -83,16 +95,17 @@ int main(void){
 		sim800l_signal_value_icon();
 //		lcd_int_al(0,0,necinnost,_left);
 
+		i2c_init(100);
+		int8_t teplota = am2320_getdata(temperat);
+		_delay_ms(10);
+		lcd_str_al(1,15,"   ",_right);
+		lcd_int_al(1,15,teplota,_right);
 
-//		int8_t teplota = am2320_getdata(temperat);
-//
-//		lcd_str_al(1,15,"   ",_right);
-//		lcd_int_al(1,15,teplota,_right);
-//
-//
-//		int8_t vlhkost = am2320_getdata(humidy);
-//		lcd_str_al(1,12,"  ",_right);
-//		lcd_int_al(1,12,vlhkost,_right);
+		_delay_ms(10);
+		int8_t vlhkost = am2320_getdata(humidy);
+		i2c_init(800);
+		lcd_str_al(1,12,"  ",_right);
+		lcd_int_al(1,12,vlhkost,_right);
 
 	}
 }
@@ -136,4 +149,26 @@ void MP3_test(){
 		_delay_ms(10000);
 		}
 
+}
+
+uint8_t i2c_scan(){
+	uint8_t i=0xff;
+	while(i--){
+		i2c_start();
+		if(i2c_write(i)){
+			i2c_stop();
+			lcd_hex_al(1,0,i,_left);
+			_delay_ms(3000);
+		}
+	}
+return 0;
+}
+
+int8_t i2c_test_address(uint8_t adresa){
+	i2c_start();
+	if(i2c_write(adresa)) {
+		i2c_stop();
+		return 1;
+	}
+	return 0;
 }
