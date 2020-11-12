@@ -53,8 +53,10 @@ int main(void){
 	lcd_str_al_P(0,0,build_info,_left);
 	lcd_str_al_P(0,15,build_time,_right);
 	lcd_str_al_P(1,15,build_date,_right);
+	lcd_cls();
 	keypad_init();
-//	ads_read_config_register();
+	ads_init();
+
 
 
 
