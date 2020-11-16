@@ -29,15 +29,16 @@ int main(void){
 	lcd_str_al_P(0,0,build_info,_left);
 	lcd_str_al_P(0,15,build_time,_right);
 	lcd_str_al_P(1,15,build_date,_right);
-
 	ads_init();
+	_delay_ms(2000);
+	lcd_cls();
 	lcd_str_al(0,0,"                ",_left);
 	lcd_str_al(0,5,"mV",_left);
 	lcd_str_al(0,12,"mV",_left);
 	while(1){
-		float vypocet = 0.1875*((float)ads_read_single_mux(ADS_MUX0));
+		float vypocet = 0.125*((float)ads_read_single_mux(ADS_MUX4));
 		lcd_show_ADS(vypocet,0);
-		vypocet = 0.1875*(float)ads_read_single_mux(ADS_MUX3);
+		vypocet = 0.125*(float)ads_read_single_mux(ADS_MUX6);
 		lcd_show_ADS(vypocet,7);
 	}
 

@@ -25,7 +25,7 @@ void ads_init(){
 		lcd_bin_al(0,0,Buf_Config_register,16,_left);
 //		ads_set_mux(ADS_MUX4);												//nastavi 100 : AINP = AIN0 and AINN = GND
 		ads_set_datarate(ADS_DR128);										//100 : 128 SPS
-		ads_set_gain(ADS_FSR0);												//001 : FSR = ±4.096 V
+		ads_set_gain(ADS_FSR1);												//001 : FSR = ±4.096 V
 		ads_bit_set((ADS_MODE),ADS_Single);						//Continuous-conversion mode
 		Buf_Config_register = ads_read_register(ADS_Config_register);
 	}
