@@ -17,8 +17,12 @@
 #include <util/delay.h>
 #include "MK_I2C/mk_i2c.h"
 #include "MK_LCD/mk_lcd44780.h"
+#include "ADS_1115/ads_1115.h"
 
 void lcd_show_ADS(uint16_t hodnota,uint8_t pozice);
+
+#define Vgas_read  	ADS_MUX4
+#define Vref_read	ADS_MUX5
 
 
 

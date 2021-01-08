@@ -36,9 +36,9 @@ int main(void){
 	lcd_str_al(0,5,"mV",_left);
 	lcd_str_al(0,12,"mV",_left);
 	while(1){
-		float vypocet = 0.125*((float)ads_read_single_mux(ADS_MUX4));
+		float vypocet = 0.125*((float)ads_read_single_mux(Vgas_read));
 		lcd_show_ADS(vypocet,0);
-		vypocet = 0.125*(float)ads_read_single_mux(ADS_MUX6);
+		vypocet = 0.125*(float)ads_read_single_mux(Vref_read);
 		lcd_show_ADS(vypocet,7);
 	}
 
