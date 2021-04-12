@@ -19,27 +19,34 @@ volatile uint8_t ads_OK;
 
 void ads_init(){
 	if(ads_test_address(ads_i2c_address)) {
-		ads_OK = 1;
+		ads_OK = 1;															//prevodnik je na adrese
 		ads_write_register(ADS_Config_register,0x8583);						//reset config
+		Buf_Config_register = ads_read_register(ADS_Config_register);		//nacte config register do Buf_Config_register
+		lcd_bin_al(0,0,Buf_Config_register,16,_left);
+//		ads_set_mux(ADS_MUX4);												//nastavi 100 : AINP = AIN0 and AINN = GND
+		ads_set_datarate(ADS_DR128);										//100 : 128 SPS
+		ads_set_gain(ADS_FSR0);												//001 : FSR = ±4.096 V
+		ads_bit_set((ADS_MODE),ADS_Single);						//Continuous-conversion mode
 		Buf_Config_register = ads_read_register(ADS_Config_register);
-		lcd_hex_al(0,0,Buf_Config_register,_left);
-	//	_delay_ms(3000);
-		Buf_Config_register |= (1<<ADS_MUX2);
-	//	lcd_cls();
-		ads_write_register(ADS_Config_register,Buf_Config_register);
-		ads_set_gain(ADS_FSR7);
-		Buf_Config_register = ads_read_register(ADS_Config_register);
-		lcd_hex_al(1,0,Buf_Config_register,_left);
-		_delay_ms(10000);
 	}
 
 }
 
 void ads_set_gain(uint8_t FSR){
+	Buf_Config_register&=0xf1ff;										//vynuluj gain
 	Buf_Config_register|= ((uint16_t)FSR << 9);
 	ads_write_register(ADS_Config_register,Buf_Config_register);
 }
-
+void ads_set_mux(uint8_t MUX){
+	Buf_Config_register&=0x8fff;										//vynuluj MUX
+	Buf_Config_register|= ((uint16_t)MUX << 12);
+	ads_write_register(ADS_Config_register,Buf_Config_register);
+}
+void ads_set_datarate(uint8_t DR){
+	Buf_Config_register&=0xFF1F;										//vynuluj datarate
+	Buf_Config_register|= ((uint16_t)DR << 5);
+	ads_write_register(ADS_Config_register,Buf_Config_register);
+}
 int8_t ads_test_address(uint8_t adresa){
 	i2c_start();
 	if(i2c_write(adresa)) {
@@ -47,6 +54,11 @@ int8_t ads_test_address(uint8_t adresa){
 		return 1;
 	}
 	return 0;
+}
+
+void ads_start_conversion(){
+	Buf_Config_register|= (1<<ADS_OS);									//nastav 1 na OS
+	ads_write_register(ADS_Config_register,Buf_Config_register);
 }
 //void ads_read_config_register(){
 //	uint8_t buffer[3];
@@ -66,6 +78,10 @@ uint16_t ads_read_register(uint8_t APR){
 	return ((buffer[0]<<8) + buffer[1]);
 
 }
+
+/*
+zapis do registru - APR Address Pointer Register urcuje do ktereho se bude zapisovat
+*/
 void ads_write_register(uint8_t APR, uint16_t data){
 	i2c_start();
 	i2c_write(ads_i2c_address);
@@ -75,4 +91,22 @@ void ads_write_register(uint8_t APR, uint16_t data){
 	i2c_stop();
 }
 
+void ads_bit_set(uint8_t bit, uint8_t hodnota){											//nastaveni bitu v registru
+	if(hodnota)	Buf_Config_register|=(1<<bit);
+	else Buf_Config_register&= ~(1<<bit);
+	ads_write_register(ADS_Config_register,Buf_Config_register);
+}
 
+uint8_t ads_bit_test(uint8_t bit){
+	if(ads_read_register(ADS_Config_register) & (1<<bit)) return 1;
+	else return 0;
+}
+
+uint16_t ads_read_single_mux(uint8_t MUX){						//nacteni hodnoty v single modu z urciteho MUX
+
+	ads_set_mux(MUX);
+	ads_start_conversion();
+	while(!(ads_bit_test(ADS_OS))) ;							//cekani na ukonceni prevodu
+	return ads_read_register(ADS_Conversion_register);
+
+}

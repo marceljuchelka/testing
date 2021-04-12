@@ -29,10 +29,12 @@
 
 void lcdprint_buffer();
 void MP3_test();
+void lcd_show_ADS(uint16_t hodnota,uint8_t pozice);
 uint8_t i2c_scan();
 int8_t i2c_test_address(uint8_t adresa);
 extern volatile uint8_t sekundy, proces;
 extern volatile uint8_t pocitadlo_sekundy;
+
 
 
 #endif /* MAIN_H_ */

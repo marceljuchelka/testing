@@ -10,7 +10,12 @@
 
 #include "../main.h"
 
-#define ads_i2c_address		0x90
+//adresy ads115
+#define ads_i2c_add_0x90		0x90
+#define ads_i2c_add_0x91		0x91
+#define ads_i2c_add_0x92		0x92
+#define ads_i2c_add_0x93		0x93
+
 
 //Config register   Default = 0x8583h  = 1000 0101 1000 0011
 #define ADS_ADS_COMP_QUE0		0
@@ -41,6 +46,7 @@
 111 : FSR = ±0.256 V
  */
 
+//Programmable gain amplifier configuration
 #define ADS_FSR0				0	//±6.144 V
 #define ADS_FSR1				1	//±4.096 V
 #define ADS_FSR2				2	//±2.048 V (default)
@@ -50,14 +56,15 @@
 #define ADS_FSR6				6	//±0.256 V
 #define ADS_FSR7				7	//±0.256 V
 
-#define ADS_DR8					0
-#define ADS_DR16				1
-#define ADS_DR32				2
-#define ADS_DR64				3
-#define ADS_DR128				4
-#define ADS_DR250				5
-#define ADS_DR475				6
-#define ADS_DR860				7
+//Data rate
+#define ADS_DR8					0	//000 : 8 SPS(default)
+#define ADS_DR16				1	//001 : 16 SPS
+#define ADS_DR32				2	//010 : 32 SPS
+#define ADS_DR64				3	//011 : 64 SPS
+#define ADS_DR128				4	//100 : 128 SPS
+#define ADS_DR250				5	//101 : 250 SPS
+#define ADS_DR475				6	//110 : 475 SPS
+#define ADS_DR860				7	//111 : 860 SPS
 
 /*mux
 000 : AINP = AIN0 and AINN = AIN1 (default)
@@ -98,7 +105,7 @@ This bit controls the operating mode.
 #define ADS_Lo_thresh_register		2
 #define ADS_Hi_thresh_register		3
 
-
+#define koeficient 				0,032768				//pro vypocet napeti z prevodniku
 
 
 void ads_init();
@@ -113,7 +120,13 @@ void ads_start_conversion();
 void ads_bit_set(uint8_t bit, uint8_t hodnota);
 uint8_t ads_bit_test(uint8_t bit);
 uint16_t ads_read_single_mux(uint8_t MUX);
+uint16_t ads_read_continual_mux(uint8_t MUX);
+float ads_U_input_single(uint8_t MUX);
+float ads_U_input_cont(uint8_t MUX);
 
+
+extern PROGMEM const float ads_fsr_table[6];
+extern volatile uint8_t ads_OK,ads_i2c_address;
 extern volatile uint16_t Buf_Config_register;
 
 #endif /* ADS_1115_H_ */

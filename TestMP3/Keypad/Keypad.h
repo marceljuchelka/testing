@@ -33,13 +33,13 @@
 void keypad_init();
 int8_t vypocet_tlacitka(uint8_t radek,uint8_t sloupec);
 int8_t key_read();
-int8_t key_read_str(char *ptr);
+int8_t key_read_str(char *ptr, uint8_t len);
 int8_t key_sn_enter();
 int8_t key_test_address(uint8_t adresa);
 
 #define Key_PCF8574_addr 0x42	//adresa expanderu klavesnice
 
-#define L1	0b00010000			//bit radku klavesnice
+#define L1	0b00010000			//1. bit radku klavesnice
 extern uint8_t klav_OK;
 
 #endif /* KEYPAD_H_ */

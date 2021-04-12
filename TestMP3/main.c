@@ -33,13 +33,14 @@ PROGMEM const char build_time[] = __TIME__;
 volatile uint8_t pocitadlo_sekundy;
 volatile uint16_t milisekundy = 100;
 char sernum_buffer[15];
+float linreg(float ppm);
 
 
 int main(void){
 
 //	DDRC = 0;
 //	PORTC = 0;
-//	uint8_t i=0xff;
+//	uint16_t vysledek = 0;
 	DDRC|= DIR_conv;
 	PORTC&=~DIR_conv;
 	lcd_init();
@@ -50,12 +51,24 @@ int main(void){
 	MP3_init();
 	MP3_play_track_folder(sampl_ozone_cleaner_pro,folder_info);
 	lcd_cls();
+	lcd_str_al_P(0,0,PSTR("TEST MP3"),_left);
+	_delay_ms(1000);
+	lcd_cls();
 	lcd_str_al_P(0,0,build_info,_left);
 	lcd_str_al_P(0,15,build_time,_right);
 	lcd_str_al_P(1,15,build_date,_right);
-	lcd_cls();
+	_delay_ms(2000);
 	keypad_init();
-	ads_init();
+//	ads_init();
+//	lcd_str_al(0,0,"                ",_left);
+//	lcd_str_al(0,5,"mV",_left);
+//	lcd_str_al(0,12,"mV",_left);
+//	while(1){
+//		float vypocet = 0.1875*((float)ads_read_single_mux(ADS_MUX0));
+//		lcd_show_ADS(vypocet,0);
+//		vypocet = 0.1875*(float)ads_read_single_mux(ADS_MUX3);
+//		lcd_show_ADS(vypocet,7);
+//	}
 
 
 
@@ -66,6 +79,7 @@ int main(void){
 	sim800l_check();
 
 	while(1){
+		linreg(1.23);
 		sekundy--;
 		lcd_int_al(0,12,sekundy,_right);
 		if(sekundy<10)lcd_int_al(0,11,0,_right);
@@ -97,17 +111,17 @@ int main(void){
 		sim800l_signal_value_icon();
 //		lcd_int_al(0,0,necinnost,_left);
 
-		i2c_init(100);
-		int8_t teplota = am2320_getdata(temperat);
-		_delay_ms(10);
-		lcd_str_al(1,15,"   ",_right);
-		lcd_int_al(1,15,teplota,_right);
-
-		_delay_ms(10);
-		int8_t vlhkost = am2320_getdata(humidy);
-		i2c_init(800);
-		lcd_str_al(1,12,"  ",_right);
-		lcd_int_al(1,12,vlhkost,_right);
+//		i2c_init(100);
+//		int8_t teplota = am2320_getdata(temperat);
+//		_delay_ms(10);
+//		lcd_str_al(1,15,"   ",_right);
+//		lcd_int_al(1,15,teplota,_right);
+//
+//		_delay_ms(10);
+//		int8_t vlhkost = am2320_getdata(humidy);
+//		i2c_init(800);
+//		lcd_str_al(1,12,"  ",_right);
+//		lcd_int_al(1,12,vlhkost,_right);
 
 	}
 }
@@ -173,4 +187,44 @@ int8_t i2c_test_address(uint8_t adresa){
 		return 1;
 	}
 	return 0;
+}
+
+void lcd_show_ADS(uint16_t hodnota,uint8_t pozice){
+	if(hodnota<10)	lcd_str_al(0,pozice,"    ",_left);
+	else if(hodnota<100)	lcd_str_al(0,pozice,"   ",_left);
+	else if(hodnota<1000)	lcd_str_al(0,pozice,"  ",_left);
+	else if(hodnota<10000)	lcd_str_al(0,pozice," ",_left);
+	else if(hodnota<100000)lcd_locate(0,pozice);
+	lcd_int(hodnota);
+}
+
+float linreg(float ppm) {
+//    float y[7]= {4, 6, 15, 12, 34, 68}; //11.4571
+	static float pole_PPM[6] = {6,5,4,3,2,1};
+	uint8_t n = 6,ii;
+		for(ii = 0; ii<6; ii++){
+			pole_PPM[ii] = pole_PPM[ii+1];
+		}
+		pole_PPM[5] = ppm;
+
+    float   sumx = 0.0;                      /* sum of x     */
+    float   sumx2 = 0.0;                     /* sum of x**2  */
+    float   sumxy = 0.0;                     /* sum of x * y */
+    float   sumy = 0.0;                      /* sum of y     */
+
+    for (int i=0;i<n;i++){
+		sumx  += i;
+		sumx2 += i*i;
+		sumxy += i * pole_PPM[i];
+		sumy  += pole_PPM[i];
+    }
+
+    float denom = (n * sumx2 - sumx*sumx);
+
+    if (denom == 0) {
+//		printf("Sing.");
+
+    }
+
+    return (n * sumxy  -  sumx * sumy) / denom;
 }

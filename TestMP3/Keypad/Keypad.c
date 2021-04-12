@@ -20,7 +20,7 @@ PROGMEM const uint8_t tlacitko[4][4] =
 uint8_t klav_OK;
 
 void keypad_init(){
-	if(key_test_address(1)){
+	if(key_test_address(Key_PCF8574_addr)){
 		klav_OK = 1;
 	}
 
@@ -64,7 +64,7 @@ int8_t vypocet_tlacitka(uint8_t radek,uint8_t sloupec){
 
 }
 
-int8_t key_read_str(char *ptr){ 						//nacti cislo 13 znaku do stringu a uloz * = 13
+int8_t key_read_str(char *ptr, uint8_t len){ 						//nacti cislo 13 znaku do stringu a uloz * = 13
 	int8_t vysledek,pozice = 0;
 	while(key_read()>=0);
 	lcd_cls();
@@ -72,7 +72,7 @@ int8_t key_read_str(char *ptr){ 						//nacti cislo 13 znaku do stringu a uloz *
 	lcd_locate(1,0);
 	while(1){
 		vysledek = key_read();
-		if(vysledek == 14 || pozice >10) {
+		if(vysledek == 14 || pozice >len) {
 			lcd_cls();
 			return 1;
 		}
@@ -111,7 +111,6 @@ return -1;
 }
 
 int8_t key_test_address(uint8_t adresa){
-	adresa = Key_PCF8574_addr;
 	i2c_start();
 	if(i2c_write(adresa)) {
 		i2c_stop();

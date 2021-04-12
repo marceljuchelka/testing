@@ -5,31 +5,32 @@
  *      Author: marcel
  *
  *      Data Rate Setting   DRS
+ *      pred pouzitim init
  */
 
 #include <avr/io.h>
+#include <avr/pgmspace.h>
 #include "../main.h"
 #include "ads_1115.h"
 #include "../MK_I2C/mk_i2c.h"
 
 volatile uint16_t Buf_Config_register;
-volatile uint8_t ads_OK;
-
+volatile uint8_t ads_OK,ads_i2c_address = ads_i2c_add_0x90;
+PROGMEM const float ads_fsr_table[6] = {0.1875,0.125,0.0625,0.03125,0.01562,0.007812}; 		//v uV/10		//pro vypocet napeti z prevodniku
 
 
 void ads_init(){
-	if(ads_test_address(ads_i2c_address)) {
+	if(ads_test_address(ads_i2c_address)) {									//testovani je li prevodnik
 		ads_OK = 1;															//prevodnik je na adrese
 		ads_write_register(ADS_Config_register,0x8583);						//reset config
 		Buf_Config_register = ads_read_register(ADS_Config_register);		//nacte config register do Buf_Config_register
-		lcd_bin_al(0,0,Buf_Config_register,16,_left);
+//		lcd_bin_al(0,0,Buf_Config_register,16,_left);
 //		ads_set_mux(ADS_MUX4);												//nastavi 100 : AINP = AIN0 and AINN = GND
-		ads_set_datarate(ADS_DR8);										//100 : 128 SPS
-		ads_set_gain(ADS_FSR1);												//001 : FSR = ±4.096 V
-		ads_bit_set((ADS_MODE),ADS_Single);						//Continuous-conversion mode
+		ads_set_datarate(ADS_DR8);											//100 : 128 SPS
+		ads_set_gain(ADS_FSR2);												//001 : FSR = ±4.096 V
+		ads_bit_set((ADS_MODE),ADS_Single);									//Continuous-conversion mode
 		Buf_Config_register = ads_read_register(ADS_Config_register);
 	}
-
 }
 
 void ads_set_gain(uint8_t FSR){
@@ -109,4 +110,24 @@ uint16_t ads_read_single_mux(uint8_t MUX){						//nacteni hodnoty v single modu 
 	while(!(ads_bit_test(ADS_OS))) ;							//cekani na ukonceni prevodu
 	return ads_read_register(ADS_Conversion_register);
 
+}
+
+uint16_t ads_read_continual_mux(uint8_t MUX){
+	return ads_read_register(ADS_Conversion_register);
+}
+
+float ads_U_input_single(uint8_t MUX){
+	uint8_t result_PGA;
+//	uint16_t hodnota;
+	result_PGA= (Buf_Config_register>>ADS_PGA0) & 3;
+	return ads_read_single_mux(MUX) * pgm_read_float(&ads_fsr_table[result_PGA]) ;								//*pgm_read_float(ads_fsr_table[1]
+}
+
+float ads_U_input_cont(uint8_t MUX){
+	uint8_t result_PGA;
+	float vypocet;
+	ads_set_mux(MUX);
+	result_PGA= (Buf_Config_register>>ADS_PGA0) & 3;
+	vypocet = ads_read_continual_mux(MUX) * pgm_read_float(&ads_fsr_table[result_PGA]) ;								//*pgm_read_float(ads_fsr_table[1]
+	return vypocet;
 }

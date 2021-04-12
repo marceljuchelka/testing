@@ -25,10 +25,21 @@
 #define ADS_PGA0				9
 #define ADS_PGA1				10
 #define ADS_PGA2				11
-#define ADS_MUX0				12
-#define ADS_MUX1				13
-#define ADS_MUX2				14
+//#define ADS_MUX0				12
+//#define ADS_MUX1				13
+//#define ADS_MUX2				14
 #define ADS_OS					15
+
+/*
+000 : FSR = ±6.144 V
+001 : FSR = ±4.096 V
+010 : FSR = ±2.048 V (default)
+011 : FSR = ±1.024 V
+100 : FSR = ±0.512 V
+101 : FSR = ±0.256 V
+110 : FSR = ±0.256 V
+111 : FSR = ±0.256 V
+ */
 
 #define ADS_FSR0				0	//±6.144 V
 #define ADS_FSR1				1	//±4.096 V
@@ -39,8 +50,49 @@
 #define ADS_FSR6				6	//±0.256 V
 #define ADS_FSR7				7	//±0.256 V
 
+#define ADS_DR8					0
+#define ADS_DR16				1
+#define ADS_DR32				2
+#define ADS_DR64				3
+#define ADS_DR128				4
+#define ADS_DR250				5
+#define ADS_DR475				6
+#define ADS_DR860				7
 
-//pointer register
+/*mux
+000 : AINP = AIN0 and AINN = AIN1 (default)
+001 : AINP = AIN0 and AINN = AIN3
+010 : AINP = AIN1 and AINN = AIN3
+011 : AINP = AIN2 and AINN = AIN3
+100 : AINP = AIN0 and AINN = GND
+101 : AINP = AIN1 and AINN = GND
+110 : AINP = AIN2 and AINN = GND
+111 : AINP = AIN3 and AINN = GND
+*/
+
+#define ADS_MUX0				0
+#define ADS_MUX1				1
+#define ADS_MUX2				2
+#define ADS_MUX3				3
+#define ADS_MUX4				4
+#define ADS_MUX5				5
+#define ADS_MUX6				6
+#define ADS_MUX7				7
+
+
+/*
+Device operating mode
+This bit controls the operating mode.
+ */
+#define ADS_Continuous_mode		0
+#define ADS_Single				1
+
+/*pointer registers
+00 : Conversion register
+01 : Config register
+10 : Lo_thresh register
+11 : Hi_thresh register
+ */
 #define ADS_Conversion_register		0
 #define ADS_Config_register			1
 #define ADS_Lo_thresh_register		2
@@ -55,6 +107,12 @@ void ads_set_gain(uint8_t gain);
 int8_t ads_test_address(uint8_t adresa);
 void ads_write_register(uint8_t APR, uint16_t data);
 uint16_t ads_read_register(uint8_t APR);
+void ads_set_mux(uint8_t MUX);
+void ads_set_datarate(uint8_t DR);
+void ads_start_conversion();
+void ads_bit_set(uint8_t bit, uint8_t hodnota);
+uint8_t ads_bit_test(uint8_t bit);
+uint16_t ads_read_single_mux(uint8_t MUX);
 
 extern volatile uint16_t Buf_Config_register;
 
